@@ -626,6 +626,161 @@ table.standings th,table.standings td,.tcell,
   vertical-align:middle!important;
 }
 
+
+/* === subtle match polish === */
+.match-list .mr:nth-child(odd) .mz-ctr{background:rgba(255,255,255,.035)!important;}
+.match-list .mr:nth-child(even) .mz-ctr{background:rgba(0,0,0,.035)!important;}
+
+.mr.current-match{
+  box-shadow:0 0 0 2px rgba(255,255,255,.58), 0 2px 8px rgba(0,0,0,.10)!important;
+}
+.mr.current-match .mz-ctr{
+  background:rgba(255,255,255,.10)!important;
+}
+.mr.current-match::after{
+  content:"กำลังแข่ง";
+  position:absolute;
+  top:-8px;
+  right:8px;
+  padding:2px 7px;
+  border-radius:7px;
+  background:#4b5563;
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+  line-height:1.3;
+}
+.mr{position:relative;}
+
+.sc-num.score-pop{animation:scorePop .22s ease-out;}
+@keyframes scorePop{
+  0%{transform:scale(1);}
+  45%{transform:scale(1.18);}
+  100%{transform:scale(1);}
+}
+@media (prefers-reduced-motion:reduce){
+  .sc-num.score-pop{animation:none;}
+}
+
+.online-status{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:5px;
+  margin:3px 3px 7px;
+  color:#4b5563;
+  font-size:11px!important;
+  font-weight:600;
+}
+.online-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#16a34a;
+  box-shadow:0 0 0 2px rgba(22,163,74,.12);
+}
+.online-status.offline .online-dot{
+  background:#9ca3af;
+  box-shadow:none;
+}
+
+
+/* stronger alternating match shades */
+.match-list .mr:nth-child(odd) .mz-ctr{
+  background:#3D434A!important;
+}
+.match-list .mr:nth-child(even) .mz-ctr{
+  background:#343A40!important;
+}
+
+/* current match highlight + corner tags fully inside frame */
+.mr.current-match{
+  box-shadow:0 0 0 2px rgba(255,255,255,.52)!important;
+  overflow:visible!important;
+}
+.mr.current-match::after{
+  content:"กำลังแข่ง";
+  position:absolute;
+  top:4px!important;
+  right:5px!important;
+  padding:2px 6px!important;
+  border-radius:6px!important;
+  background:#5B636C!important;
+  color:#fff!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+  z-index:4;
+}
+.mr.current-match::before{
+  content:"⚽";
+  position:absolute;
+  top:4px;
+  left:5px;
+  width:20px;
+  height:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:6px;
+  background:rgba(255,255,255,.92);
+  font-size:13px;
+  line-height:1;
+  z-index:4;
+}
+
+
+/* remove previous square ball badge */
+.mr.current-match::before{content:none!important;}
+
+/* score-zone corner triangle with ball */
+.mr.current-match .mz-ctr{position:relative!important;overflow:hidden!important;}
+.mr.current-match .mz-ctr::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:0;
+  height:0;
+  border-top:34px solid rgba(255,255,255,.94);
+  border-right:34px solid transparent;
+  z-index:4;
+  pointer-events:none;
+}
+.mr.current-match .mz-ctr::after{
+  content:"⚽";
+  position:absolute;
+  top:2px;
+  left:3px;
+  width:18px;
+  height:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  line-height:1;
+  z-index:5;
+  pointer-events:none;
+}
+
+
+/* current match: football corner marker only */
+.mr.current-match::after{content:none!important;}
+
+
+/* larger current-match corner marker for mobile visibility */
+.mr.current-match .mz-ctr::before{
+  border-top-width:44px!important;
+  border-right-width:44px!important;
+}
+.mr.current-match .mz-ctr::after{
+  top:3px!important;
+  left:4px!important;
+  width:23px!important;
+  height:23px!important;
+  font-size:16px!important;
+}
+
 </style>
 </head>
 <body>
@@ -785,6 +940,7 @@ async function pollRemote(){
 // ── setup state ────────────────────────────────────────────────────────────────
 var setupMode="preset150",setupBudget=150,setupCustomMins=150,setupBreak=2;
 var setupFontSize=16;
+var scorePulse=null;
 var currentTab="schedule";
 
 function suggestBreak(b){var v=Math.floor((b-112)/13);return Math.max(0,Math.min(6,v));}
@@ -987,7 +1143,9 @@ function renderScheduleTab(){
   html+='<div class="result-heading">ผลการแข่งขัน</div>';
   var groupMatches=matches.filter(function(m){return m.stage==="group";});
   applyDisplayOrientation(groupMatches);
+  html+='<div class="match-list">';
   groupMatches.forEach(function(m){html+=renderMR(m,false,null,null,false);});
+  html+='</div>';
   html+='<div class="sec">รอบเพลย์ออฟ</div>';
   var thirdM=matches.find(function(m){return m.id==="third";}),finalM=matches.find(function(m){return m.id==="final";});
   if(thirdM&&st.length>=4){
@@ -1036,7 +1194,16 @@ function renderMR(m,isNup,t1override,t2override,provisional){
   var leftScore=canSwap?m.s2:m.s1, rightScore=canSwap?m.s1:m.s2;
   var leftDec=canSwap?"dec2":"dec1", leftInc=canSwap?"inc2":"inc1";
   var rightDec=canSwap?"dec1":"dec2", rightInc=canSwap?"inc1":"inc2";
-  var cls="mr";
+  var currentId=null;
+  if(state&&state.matches){
+    var unfinishedGroups=state.matches.filter(function(x){return x.stage==="group"&&!x.played;});
+    if(unfinishedGroups.length) currentId=unfinishedGroups[0].id;
+    else{
+      var unfinishedPlayoffs=state.matches.filter(function(x){return x.stage!=="group"&&!x.played;});
+      if(unfinishedPlayoffs.length) currentId=unfinishedPlayoffs[0].id;
+    }
+  }
+  var cls="mr"+(m.id===currentId?" current-match":"");
   var stg="";
   var pvs=provisional?" provisional":"";
   return'<div class="'+cls+'" data-id="'+m.id+'">'+
@@ -1050,13 +1217,13 @@ function renderMR(m,isNup,t1override,t2override,provisional){
         '<div class="stage-lbl">'+stg+'</div>'+
         '<div class="sc-half">'+
           '<button class="sc-btn" data-act="'+leftDec+'" data-id="'+m.id+'">−</button>'+
-          '<span class="sc-num">'+(m.played?leftScore:'-')+'</span>'+
+          '<span class="sc-num'+(scorePulse&&scorePulse.id===m.id&&scorePulse.side===(canSwap?2:1)?' score-pop':'')+'">'+(m.played?leftScore:'-')+'</span>'+
           '<button class="sc-btn" data-act="'+leftInc+'" data-id="'+m.id+'">+</button>'+
         '</div>'+
         '<span class="sc-sep">:</span>'+
         '<div class="sc-half">'+
           '<button class="sc-btn" data-act="'+rightDec+'" data-id="'+m.id+'">−</button>'+
-          '<span class="sc-num">'+(m.played?rightScore:'-')+'</span>'+
+          '<span class="sc-num'+(scorePulse&&scorePulse.id===m.id&&scorePulse.side===(canSwap?1:2)?' score-pop':'')+'">'+(m.played?rightScore:'-')+'</span>'+
           '<button class="sc-btn" data-act="'+rightInc+'" data-id="'+m.id+'">+</button>'+
         '</div>'+
       '</div>'+
@@ -1124,10 +1291,11 @@ function bindEvents(){
   document.querySelectorAll("[data-act]").forEach(function(el){
     el.addEventListener("click",function(){
       var a=el.getAttribute("data-act"),id=el.getAttribute("data-id");
-      if(a==="inc1") bump(id,1,1);
-      else if(a==="dec1") bump(id,1,-1);
-      else if(a==="inc2") bump(id,2,1);
-      else if(a==="dec2") bump(id,2,-1);
+      if(a==="inc1"){scorePulse={id:id,side:1};bump(id,1,1);}
+      else if(a==="dec1"){scorePulse={id:id,side:1};bump(id,1,-1);}
+      else if(a==="inc2"){scorePulse={id:id,side:2};bump(id,2,1);}
+      else if(a==="dec2"){scorePulse={id:id,side:2};bump(id,2,-1);}
+      setTimeout(function(){scorePulse=null;},300);
     });
   });
 
