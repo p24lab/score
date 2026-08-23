@@ -404,6 +404,29 @@ table.standings th,table.standings td,.tcell,
   box-sizing:border-box;
 }
 
+
+/* standings row grouping */
+.standings tbody tr:nth-child(odd){background:rgba(255,255,255,.055)!important;}
+.standings tbody tr:nth-child(even){background:rgba(255,255,255,.015)!important;}
+/* stronger divider between ranks 1–2 and 3–4 */
+.standings tbody tr:nth-child(3) td{
+  border-top:3px solid rgba(255,255,255,.42)!important;
+}
+
+
+/* ranks 3–4: white rank numbers */
+.standings tbody tr:nth-child(3) .rpill,
+.standings tbody tr:nth-child(4) .rpill{
+  color:#fff!important;
+}
+
+
+/* subtler divider between rank 2 and 3 */
+.standings tbody tr:nth-child(3) td{
+  border-top-width:2px!important;
+  border-top-color:rgba(255,255,255,.28)!important;
+}
+
 </style>
 </head>
 <body>
