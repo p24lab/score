@@ -781,6 +781,177 @@ table.standings th,table.standings td,.tcell,
   font-size:16px!important;
 }
 
+
+/* current match: no outer highlight frame; keep football corner tag only */
+.mr.current-match{
+  box-shadow:none!important;
+  outline:none!important;
+}
+
+
+/* current match live badge: floats over top edge without touching rounded corners */
+.mr.current-match{
+  position:relative!important;
+  overflow:visible!important;
+}
+.mr.current-match .mz-ctr::before,
+.mr.current-match .mz-ctr::after{
+  content:none!important;
+}
+.mr.current-match::before{
+  content:"⚽  LIVE";
+  position:absolute;
+  top:-8px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:2px 8px 3px;
+  border:1px solid #E53935;
+  border-radius:6px;
+  background:#E53935;
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+  line-height:1.2;
+  letter-spacing:.03em;
+  z-index:6;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+
+/* LIVE badge: guaranteed visible inside top edge */
+.mr.current-match{
+  position:relative!important;
+}
+.mr.current-match::before{
+  content:"⚽ LIVE"!important;
+  position:absolute!important;
+  top:3px!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  padding:2px 8px 3px!important;
+  border-radius:6px!important;
+  background:#E53935!important;
+  color:#fff!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  line-height:1.2!important;
+  letter-spacing:.03em!important;
+  z-index:20!important;
+  white-space:nowrap!important;
+  pointer-events:none!important;
+}
+
+
+/* preserve match row rounded corners */
+.mr.current-match{
+  overflow:hidden!important;
+  box-shadow:none!important;
+  outline:none!important;
+}
+.mr.current-match::before,
+.mr.current-match::after,
+.mr.current-match .mz-ctr::before,
+.mr.current-match .mz-ctr::after{
+  content:none!important;
+}
+
+/* external LIVE wrapper so the row itself keeps its radius */
+.match-wrap{
+  position:relative;
+  margin-bottom:8px;
+}
+.match-wrap .mr{
+  margin-bottom:0!important;
+}
+.match-wrap.current-wrap{
+  padding-top:7px;
+}
+.match-live-badge{
+  position:absolute;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:20;
+  padding:2px 8px 3px;
+  border-radius:6px;
+  background:#E53935;
+  color:#fff;
+  font-size:10px!important;
+  font-weight:800;
+  line-height:1.2;
+  letter-spacing:.03em;
+  white-space:nowrap;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+  pointer-events:none;
+}
+
+
+/* LIVE badge: gentle broadcast-style blink */
+.match-live-badge{
+  animation:liveBlink 1.25s ease-in-out infinite!important;
+}
+@keyframes liveBlink{
+  0%,100%{opacity:1;}
+  50%{opacity:.45;}
+}
+@media (prefers-reduced-motion:reduce){
+  .match-live-badge{animation:none!important;}
+}
+
+
+/* disable previous opacity fade */
+.match-live-badge{opacity:1!important;}
+
+.match-live-badge{animation:none!important;background:#E53935!important;}
+.live-word{display:inline-block;animation:liveWordBlink .9s steps(1,end) infinite;}
+@keyframes liveWordBlink{
+  0%,49%{visibility:visible;}
+  50%,100%{visibility:hidden;}
+}
+@media (prefers-reduced-motion:reduce){.live-word{animation:none!important;visibility:visible!important;}}
+
+
+/* LIVE icon comparison strip */
+.match-live-badge.live-demo{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  padding:3px 5px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  animation:none!important;
+  top:-11px!important;
+}
+.live-choice{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  padding:3px 5px;
+  border-radius:6px;
+  background:#E53935;
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:0 1px 3px rgba(0,0,0,.18);
+}
+.live-choice .live-word{
+  animation:liveWordBlink .9s steps(1,end) infinite;
+}
+@media(max-width:420px){
+  .match-live-badge.live-demo{
+    gap:2px!important;
+    transform:translateX(-50%) scale(.82)!important;
+    transform-origin:center top;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1144,16 +1315,16 @@ function renderScheduleTab(){
   var groupMatches=matches.filter(function(m){return m.stage==="group";});
   applyDisplayOrientation(groupMatches);
   html+='<div class="match-list">';
-  groupMatches.forEach(function(m){html+=renderMR(m,false,null,null,false);});
+  groupMatches.forEach(function(m){html+=renderMatchWrap(m,false,null,null,false);});
   html+='</div>';
   html+='<div class="sec">รอบเพลย์ออฟ</div>';
   var thirdM=matches.find(function(m){return m.id==="third";}),finalM=matches.find(function(m){return m.id==="final";});
   if(thirdM&&st.length>=4){
     html+='<div class="playoff-meta">ชิงที่ 3 • เล่น '+thirdM.dur+' นาที</div>';
-    html+=renderMR(thirdM,false,st[2].code,st[3].code,true);
+    html+=renderMatchWrap(thirdM,false,st[2].code,st[3].code,true);
   }
   html+='<div class="playoff-meta">ชิงที่ 1 • เล่น '+finalM.dur+' นาที</div>';
-  html+=renderMR(finalM,false,st[0].code,st[1].code,true);
+  html+=renderMatchWrap(finalM,false,st[0].code,st[1].code,true);
   return html;
 }
 
@@ -1185,6 +1356,23 @@ function applyDisplayOrientation(groupMatches){
       cur._displaySwap=!(cur.team1===po[0]&&cur.team2===po[1]);
     }
   }
+}
+
+function renderMatchWrap(m,isNup,t1override,t2override,provisional){
+  var currentId=null;
+  if(state&&state.matches){
+    var unfinishedGroups=state.matches.filter(function(x){return x.stage==="group"&&!x.played;});
+    if(unfinishedGroups.length) currentId=unfinishedGroups[0].id;
+    else{
+      var unfinishedPlayoffs=state.matches.filter(function(x){return x.stage!=="group"&&!x.played;});
+      if(unfinishedPlayoffs.length) currentId=unfinishedPlayoffs[0].id;
+    }
+  }
+  var isCurrent=m.id===currentId;
+  return '<div class="match-wrap'+(isCurrent?' current-wrap':'')+'">'+
+    (isCurrent?'<div class="match-live-badge live-demo"><span class="live-choice">⚽ <span class="live-word">LIVE</span></span><span class="live-choice">🏐 <span class="live-word">LIVE</span></span><span class="live-choice">🏀 <span class="live-word">LIVE</span></span><span class="live-choice">⚾ <span class="live-word">LIVE</span></span><span class="live-choice">🎾 <span class="live-word">LIVE</span></span><span class="live-choice">🏓 <span class="live-word">LIVE</span></span></div>':'')+
+    renderMR(m,isNup,t1override,t2override,provisional)+
+  '</div>';
 }
 
 function renderMR(m,isNup,t1override,t2override,provisional){
