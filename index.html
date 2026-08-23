@@ -364,6 +364,46 @@ table.standings th,table.standings td,.tcell,
   font-size:calc(var(--app-font-size) + 21px)!important;
 }
 
+
+/* latest visual refinements */
+.mz-side.team-Y .s-name{color:#111111!important;}
+
+/* standings: color bar only, no color name */
+.team-chip .team-name-text{display:none!important;}
+.team-dot{
+  width:34px!important;
+  height:22px!important;
+  border-radius:4px!important;
+  display:inline-block!important;
+  flex:0 0 34px!important;
+}
+
+/* settings label standard white */
+.settings-section .field-row label{color:#fff!important;}
+
+/* playoff spacing: heading belongs to the row below */
+.playoff-meta{
+  margin:10px 2px 3px!important;
+  color:#111!important;
+  font-weight:800!important;
+}
+.playoff-meta + .mr{
+  margin-top:0!important;
+}
+
+
+/* requested final corrections */
+.btn-reset{color:#FFFFFF!important;}
+.standings .team-chip{justify-content:center!important;}
+.standings .team-dot{
+  width:42px!important;
+  height:24px!important;
+  min-width:42px!important;
+  border-radius:5px!important;
+  display:inline-block!important;
+  box-sizing:border-box;
+}
+
 </style>
 </head>
 <body>
@@ -522,7 +562,7 @@ async function pollRemote(){
 
 // ── setup state ────────────────────────────────────────────────────────────────
 var setupMode="preset150",setupBudget=150,setupCustomMins=150,setupBreak=2;
-var setupFontSize=15;
+var setupFontSize=16;
 var currentTab="schedule";
 
 function suggestBreak(b){var v=Math.floor((b-112)/13);return Math.max(0,Math.min(6,v));}
@@ -662,9 +702,9 @@ function summaryHTML(){
     endTs=cursor;
   }
   var tc=started?(state.teamCount||4):setupTeamCount;
-  var playoffText=tc===4?' + ชิงที่ 3 & ชิงที่ 1':' + ชิงที่ 1';
+  var playoffText=tc===4?' + ชิงที่ 3 + ชิงที่ 1':' + ชิงที่ 1';
   return'<div class="summary-line">'+
-    '<b>'+tc+' ทีม • พบกันหมด 2 รอบ ('+c.sched.groupMatches+' นัด)'+playoffText+'</b><br>'+
+    '<b>'+tc+' ทีม • พบกันหมด 2 รอบ'+playoffText+'</b><br>'+
     'เริ่มแข่ง '+(started?safeClock(state.startTime):'--:--')+' น. / คาดว่าจบ '+(started?safeClock(endTs):'--:--')+' น. / เวลารวม '+safeDuration(c.budget)+' ชม. / พักระหว่างนัด '+c.brk+' นาที'+
   '</div>';
 }
@@ -706,7 +746,7 @@ function renderScheduleTab(){
       '<div class="card color-picker-card"><h2>เลือกสี</h2>'+
       '<div class="hint">เลือก '+setupTeamCount+' สีตามจำนวนทีม • ลำดับที่ 1 และ 2 จะเป็นคู่ที่เล่นนัดแรก</div>'+
       '<div class="color-picker">'+colorTiles+'</div>'+
-      '<div class="vs-badge">เลือกแล้ว '+selectedColors.length+'/'+setupTeamCount+(firstText?' &nbsp;•&nbsp; '+firstText:'')+'</div>'+
+      '<div class="vs-badge">เลือกแล้ว '+selectedColors.length+'/'+setupTeamCount+(firstText?'  +  '+firstText:'')+'</div>'+
       '<button class="btn-primary" id="startBtn"'+(!complete||computeSched(setupMode==="custom"?setupCustomMins:setupBudget,setupBreak).insuf?' disabled':'')+'>🏁 สร้างตารางและเริ่มการแข่งขัน</button>'+
       '</div>';
   }
