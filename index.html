@@ -451,6 +451,125 @@ table.standings th,table.standings td,.tcell,
   border-color:var(--surface2)!important;
 }
 
+
+/* top menu: keep original layout/width, only disable sticky */
+.tabs{
+  position:relative!important;
+  top:auto!important;
+  z-index:auto!important;
+}
+
+
+/* menu alignment: same width as content cards, close to page top */
+.tabs{
+  width:100%!important;
+  max-width:none!important;
+  margin:6px 0 10px!important;
+  position:relative!important;
+  top:auto!important;
+  left:auto!important;
+  transform:none!important;
+  box-sizing:border-box!important;
+}
+
+/* settings page section heading */
+.settings-page-heading{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:10px 2px 8px;
+  color:#111;
+  font-family:'Inter',sans-serif;
+  font-size:var(--app-font-size);
+  font-weight:800;
+}
+.settings-page-heading::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:#111;
+  opacity:.2;
+}
+
+
+/* top spacing refinement */
+#app{
+  padding-top:2px!important;
+}
+.tabs{
+  margin-top:0!important;
+  margin-bottom:10px!important;
+}
+/* make schedule-page heading spacing match settings-page heading */
+.result-heading{
+  margin-top:10px!important;
+  margin-bottom:8px!important;
+}
+
+
+/* settings-page radius alignment */
+.tabs,
+.settings-card{
+  border-radius:10px!important;
+}
+
+
+/* top menu: equal breathing room inside the frame */
+.tabs{
+  padding:6px!important;
+  gap:6px!important;
+  box-sizing:border-box!important;
+}
+.tab-btn{
+  margin:0!important;
+}
+
+
+/* result score controls: align score and +/− buttons on one level */
+.sc-half{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+}
+.sc-btn,
+.sc-num{
+  align-self:center!important;
+}
+.sc-num{
+  line-height:1!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+
+
+/* score row: align visible glyphs to the same bottom line */
+.sc-half{
+  display:flex!important;
+  align-items:flex-end!important;
+}
+.sc-btn,
+.sc-num{
+  box-sizing:border-box!important;
+  margin:0!important;
+  vertical-align:bottom!important;
+}
+.sc-btn{
+  display:inline-flex!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+  padding-bottom:4px!important;
+  line-height:1!important;
+}
+.sc-num{
+  display:inline-flex!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+  padding-bottom:4px!important;
+  line-height:1!important;
+}
+
 </style>
 </head>
 <body>
@@ -764,12 +883,13 @@ function renderSettingsTab(){
 
   var pBtn=function(mode,lbl){return'<button class="preset-btn'+(setupMode===mode?' active':'')+'" data-preset="'+mode+'"'+(started?' disabled':'')+'>'+lbl+'</button>';};
 
-  return '<div class="settings-card">'+
+  return '<div class="settings-page-heading">การตั้งค่า</div>'+
+    '<div class="settings-card">'+
     summaryHTML()+
     '<div class="settings-section"><h2>จำนวนทีม</h2><div class="preset-row"><button class="preset-btn'+(setupTeamCount===3?' active':'')+'" data-teamcount="3"'+(started?' disabled':'')+'>3 ทีม</button><button class="preset-btn'+(setupTeamCount===4?' active':'')+'" data-teamcount="4"'+(started?' disabled':'')+'>4 ทีม</button></div></div>'+
     '<div class="settings-section"><h2>ตั้งเวลาการแข่งขัน</h2><div class="preset-row">'+pBtn("preset120","2:00 ชม.")+pBtn("preset150","2:30 ชม.")+pBtn("custom","กำหนดเอง")+'</div>'+
       (setupMode==="custom"?'<div class="custom-row"><label style="font-size:12.5px;color:var(--muted);">เวลารวม (นาที)</label><input type="number" min="60" step="5" class="num-input" id="customMins" value="'+setupCustomMins+'"'+(started?' disabled':'')+'></div>':'')+preview+'</div>'+
-    '<div class="settings-section"><h2>ตั้งเวลาพัก</h2><div class="field-row" style="margin-bottom:0"><label>พักระหว่างนัด (นาที)</label><input type="number" min="0" max="10" class="num-input" id="breakInput" value="'+c.brk+'"'+(started?' disabled':'')+'></div></div>'+
+    '<div class="settings-section"><h2>ตั้งเวลาช่วงเปลี่ยนทีม+ทดเวลา (ประมาณ)</h2><div class="field-row" style="margin-bottom:0"><label>ช่วงเปลี่ยนทีม+ทดเวลา (นาที)</label><input type="number" min="0" max="10" class="num-input" id="breakInput" value="'+c.brk+'"'+(started?' disabled':'')+'></div></div>'+
     '<div class="settings-section"><h2>ขนาดตัวหนังสือ</h2><div class="preset-row">'+
       '<button class="preset-btn'+(setupFontSize===14?' active':'')+'" data-fontsize="14">เล็ก</button>'+
       '<button class="preset-btn'+(setupFontSize===15?' active':'')+'" data-fontsize="15">กลาง</button>'+
