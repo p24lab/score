@@ -570,6 +570,62 @@ table.standings th,table.standings td,.tcell,
   line-height:1!important;
 }
 
+
+/* standings: align numbers, team swatch and rank marker on the same lower baseline */
+.standings th,
+.standings td{
+  vertical-align:bottom!important;
+}
+.standings td{
+  line-height:1!important;
+}
+.standings .tcell,
+.standings .team-chip,
+.standings .rpill,
+.standings .team-dot{
+  vertical-align:bottom!important;
+}
+.standings .tcell,
+.standings .team-chip{
+  display:inline-flex!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+}
+.standings .rpill{
+  display:inline-flex!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+  line-height:1!important;
+}
+
+
+/* ranking pill: keep box alignment, center numeral inside */
+.standings .rpill{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1!important;
+  vertical-align:bottom!important;
+}
+
+
+/* standings: rank pill and team color bar share the same visual level */
+.standings .team-chip{
+  height:100%!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  vertical-align:middle!important;
+}
+.standings .team-dot{
+  height:24px!important;
+  align-self:center!important;
+  vertical-align:middle!important;
+}
+.standings .rpill{
+  vertical-align:middle!important;
+}
+
 </style>
 </head>
 <body>
@@ -871,7 +927,8 @@ function summaryHTML(){
   var playoffText=tc===4?' + ชิงที่ 3 + ชิงที่ 1':' + ชิงที่ 1';
   return'<div class="summary-line">'+
     '<b>'+tc+' ทีม • พบกันหมด 2 รอบ'+playoffText+'</b><br>'+
-    'เริ่มแข่ง '+(started?safeClock(state.startTime):'--:--')+' น. / คาดว่าจบ '+(started?safeClock(endTs):'--:--')+' น. / เวลารวม '+safeDuration(c.budget)+' ชม. / พักระหว่างนัด '+c.brk+' นาที'+
+    'เริ่มแข่ง '+(started?safeClock(state.startTime):'--:--')+' น. / คาดว่าจบ '+(started?safeClock(endTs):'--:--')+' น. / เวลารวม '+safeDuration(c.budget)+' ชม. / พักระหว่างนัด '+c.brk+' นาที / '+
+    (tc===4?'ชิงที่ 3 เล่น '+c.sched.thirdMin+' นาที / ':'')+'ชิงที่ 1 เล่น '+c.sched.finalMin+' นาที'+
   '</div>';
 }
 
