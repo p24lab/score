@@ -757,7 +757,7 @@ function renderScheduleTab(){
   var html='<div class="result-heading">ตาราง</div>';
   html+='<div class="card"><h2>ตารางคะแนน</h2><table class="standings"><thead><tr><th></th><th class="tc">ทีม</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead><tbody>';
   st.forEach(function(s,i){
-    html+='<tr class="rank-'+(i+1)+'"><td><span class="rpill">'+(i+1)+'</span></td><td class="tc"><span class="tcell team-chip"><span class="team-dot" style="background:'+TEAMS[s.code].color+'"></span>'+TEAMS[s.code].name+'</span></td><td>'+s.P+'</td><td>'+s.W+'</td><td>'+s.D+'</td><td>'+s.L+'</td><td>'+s.GF+'</td><td>'+s.GA+'</td><td>'+(s.GD>0?'+':'')+s.GD+'</td><td class="pts">'+s.Pts+'</td></tr>';
+    html+='<tr class="rank-'+(i+1)+'"><td><span class="rpill">'+(i+1)+'</span></td><td class="tc"><span class="tcell team-chip"><span class="team-dot" style="background:'+TEAMS[s.code].color+'"></span></span></td><td>'+s.P+'</td><td>'+s.W+'</td><td>'+s.D+'</td><td>'+s.L+'</td><td>'+s.GF+'</td><td>'+s.GA+'</td><td>'+(s.GD>0?'+':'')+s.GD+'</td><td class="pts">'+s.Pts+'</td></tr>';
   });
   html+='</tbody></table></div>';
   html+='<div class="result-heading">ผลการแข่งขัน</div>';
