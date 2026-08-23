@@ -337,6 +337,12 @@ table.standings th,table.standings td,.tcell,
   .sc-num{font-size:29px!important;min-width:22px!important;}
 }
 
+
+/* mobile readability update */
+body,button,input,select,textarea,.card,.settings-card,.info-strip,.tabs,.mr,.card .hint,.summary-line,.settings-row .sub,.settings-row .label,table.standings th,table.standings td,.tcell,.stage-lbl,.sc-sep,.locked-note,.share-note,.vs-badge,.color-pick,.tab-btn,.btn-primary,.btn-reset,.playoff-meta,.mz-side .s-name{font-size:15px!important;}
+.card h2,.settings-title,.result-heading,.sec,.tab-btn.active{font-size:15px!important;font-weight:800!important;}
+.sc-num{font-size:36px!important;font-weight:700!important;}
+
 </style>
 </head>
 <body>
@@ -692,8 +698,11 @@ function renderScheduleTab(){
   groupMatches.forEach(function(m){html+=renderMR(m,false,null,null,false);});
   html+='<div class="sec">รอบเพลย์ออฟ</div>';
   var thirdM=matches.find(function(m){return m.id==="third";}),finalM=matches.find(function(m){return m.id==="final";});
-  html+='<div class="playoff-meta">'+(thirdM?'ชิงที่ 3 เล่น '+thirdM.dur+' นาที &nbsp;•&nbsp; ':'')+'ชิงที่ 1 เล่น '+finalM.dur+' นาที</div>';
-  if(thirdM&&st.length>=4) html+=renderMR(thirdM,false,st[2].code,st[3].code,true);
+  if(thirdM&&st.length>=4){
+    html+='<div class="playoff-meta">ชิงที่ 3 • เล่น '+thirdM.dur+' นาที</div>';
+    html+=renderMR(thirdM,false,st[2].code,st[3].code,true);
+  }
+  html+='<div class="playoff-meta">ชิงที่ 1 • เล่น '+finalM.dur+' นาที</div>';
   html+=renderMR(finalM,false,st[0].code,st[1].code,true);
   return html;
 }
@@ -736,7 +745,7 @@ function renderMR(m,isNup,t1override,t2override,provisional){
   var leftDec=canSwap?"dec2":"dec1", leftInc=canSwap?"inc2":"inc1";
   var rightDec=canSwap?"dec1":"dec2", rightInc=canSwap?"inc1":"inc2";
   var cls="mr";
-  var stg=m.stage==="third"?"ชิงที่ 3":m.stage==="final"?"ชิงที่ 1":"นัดที่ "+(parseInt(m.id.replace("g",""))+1);
+  var stg="";
   var pvs=provisional?" provisional":"";
   return'<div class="'+cls+'" data-id="'+m.id+'">'+
     // left side – coloured background
