@@ -913,43 +913,27 @@ table.standings th,table.standings td,.tcell,
 @media (prefers-reduced-motion:reduce){.live-word{animation:none!important;visibility:visible!important;}}
 
 
-/* LIVE icon comparison strip */
-.match-live-badge.live-demo{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:4px!important;
-  padding:3px 5px!important;
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
+/* iPhone/Safari-friendly LIVE blink: ball stays visible, LIVE text pulses */
+.match-live-badge{
   animation:none!important;
-  top:-11px!important;
+  background:#E53935!important;
+  opacity:1!important;
 }
-.live-choice{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:2px;
-  padding:3px 5px;
-  border-radius:6px;
-  background:#E53935;
-  color:#fff;
-  font-size:10px;
-  font-weight:800;
-  line-height:1;
-  white-space:nowrap;
-  box-shadow:0 1px 3px rgba(0,0,0,.18);
+.live-word{
+  display:inline-block!important;
+  visibility:visible!important;
+  opacity:1;
+  animation:liveTextPulse .85s ease-in-out infinite!important;
+  -webkit-animation:liveTextPulse .85s ease-in-out infinite!important;
+  will-change:opacity;
 }
-.live-choice .live-word{
-  animation:liveWordBlink .9s steps(1,end) infinite;
+@-webkit-keyframes liveTextPulse{
+  0%,100%{opacity:1;}
+  50%{opacity:.18;}
 }
-@media(max-width:420px){
-  .match-live-badge.live-demo{
-    gap:2px!important;
-    transform:translateX(-50%) scale(.82)!important;
-    transform-origin:center top;
-  }
+@keyframes liveTextPulse{
+  0%,100%{opacity:1;}
+  50%{opacity:.18;}
 }
 
 </style>
@@ -1370,7 +1354,7 @@ function renderMatchWrap(m,isNup,t1override,t2override,provisional){
   }
   var isCurrent=m.id===currentId;
   return '<div class="match-wrap'+(isCurrent?' current-wrap':'')+'">'+
-    (isCurrent?'<div class="match-live-badge live-demo"><span class="live-choice">⚽ <span class="live-word">LIVE</span></span><span class="live-choice">🏐 <span class="live-word">LIVE</span></span><span class="live-choice">🏀 <span class="live-word">LIVE</span></span><span class="live-choice">⚾ <span class="live-word">LIVE</span></span><span class="live-choice">🎾 <span class="live-word">LIVE</span></span><span class="live-choice">🏓 <span class="live-word">LIVE</span></span></div>':'')+
+    (isCurrent?'<div class="match-live-badge">⚽ <span class="live-word">LIVE</span></div>':'')+
     renderMR(m,isNup,t1override,t2override,provisional)+
   '</div>';
 }
