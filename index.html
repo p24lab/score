@@ -427,6 +427,30 @@ table.standings th,table.standings td,.tcell,
   border-top-color:rgba(255,255,255,.28)!important;
 }
 
+
+/* unified ranking number style */
+.standings .rpill{
+  color:#fff!important;
+  background:rgba(255,255,255,.12)!important;
+}
+.standings tr.rank-1 .rpill,
+.standings tr.rank-2 .rpill,
+.standings tr.rank-3 .rpill,
+.standings tr.rank-4 .rpill{
+  color:#fff!important;
+  background:rgba(255,255,255,.12)!important;
+}
+
+
+/* latest typography / standings heading */
+.sc-num{font-size:calc(var(--app-font-size) + 17px)!important;}
+
+
+/* match border = score area background */
+.mr{
+  border-color:var(--surface2)!important;
+}
+
 </style>
 </head>
 <body>
@@ -777,8 +801,8 @@ function renderScheduleTab(){
   var cursor=state.startTime;
   matches.forEach(function(m,i){m._start=cursor;m._end=cursor+m.dur*60000;cursor=m._end+(i<matches.length-1?(state.breakMins||0)*60000:0);});
   var st=standings(matches);
-  var html='<div class="result-heading">ตาราง</div>';
-  html+='<div class="card"><h2>ตารางคะแนน</h2><table class="standings"><thead><tr><th></th><th class="tc">ทีม</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead><tbody>';
+  var html='<div class="result-heading">ตารางคะแนน</div>';
+  html+='<div class="card"><table class="standings"><thead><tr><th></th><th class="tc">ทีม</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead><tbody>';
   st.forEach(function(s,i){
     html+='<tr class="rank-'+(i+1)+'"><td><span class="rpill">'+(i+1)+'</span></td><td class="tc"><span class="tcell team-chip"><span class="team-dot" style="background:'+TEAMS[s.code].color+'"></span></span></td><td>'+s.P+'</td><td>'+s.W+'</td><td>'+s.D+'</td><td>'+s.L+'</td><td>'+s.GF+'</td><td>'+s.GA+'</td><td>'+(s.GD>0?'+':'')+s.GD+'</td><td class="pts">'+s.Pts+'</td></tr>';
   });
