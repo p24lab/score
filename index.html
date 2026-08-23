@@ -1007,6 +1007,39 @@ table.standings th,table.standings td,.tcell,
   50%,100%{visibility:hidden;}
 }
 
+
+/* subtle app version marker */
+.app-version{
+  margin-top:5px;
+  text-align:right;
+  font-size:10px!important;
+  font-weight:500;
+  color:rgba(255,255,255,.38);
+  line-height:1;
+  user-select:none;
+}
+
+
+/* version label: normal app font size */
+.app-version{
+  font-size:var(--app-font-size)!important;
+}
+
+
+/* played matches fade slightly so the active match stands out */
+.mr.played-match{
+  opacity:.72;
+}
+.mr.current-match,
+.mr.current-match.played-match{
+  opacity:1!important;
+}
+
+/* keep buttons usable/readable in faded rows */
+.mr.played-match .sc-btn{
+  opacity:.9;
+}
+
 </style>
 </head>
 <body>
@@ -1211,8 +1244,21 @@ async function startTournament(){
 function bump(id,side,d){
   var m=state.matches.find(function(x){return x.id===id;});
   if(!m) return;
-  if(!m.played){m.s1=0;m.s2=0;m.played=true;}
-  var k=side===1?"s1":"s2";m[k]=Math.max(0,m[k]+d);
+
+  /* If the match is still blank, minus does nothing. */
+  if(!m.played){
+    if(d<0) return;
+    m.s1=0;m.s2=0;m.played=true;
+  }
+
+  var k=side===1?"s1":"s2";
+  m[k]=Math.max(0,m[k]+d);
+
+  /* When both scores are reduced back to 0-0, return to blank - : -. */
+  if(m.s1===0&&m.s2===0){
+    m.played=false;
+  }
+
   render();scheduleSave();
 }
 
@@ -1335,6 +1381,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">↺ ล้างและสร้างตารางใหม่</button>':'')+
+    '<div class="app-version">v46.4</div>'+
     '</div>';
 }
 
@@ -1446,7 +1493,7 @@ function renderMR(m,isNup,t1override,t2override,provisional){
       if(unfinishedPlayoffs.length) currentId=unfinishedPlayoffs[0].id;
     }
   }
-  var cls="mr"+(m.id===currentId?" current-match":"");
+  var cls="mr"+(m.id===currentId?" current-match":"")+(m.played?" played-match":"");
   var stg="";
   var pvs=provisional?" provisional":"";
   return'<div class="'+cls+'" data-id="'+m.id+'">'+
@@ -1479,6 +1526,28 @@ function renderMR(m,isNup,t1override,t2override,provisional){
 }
 
 // ── events ─────────────────────────────────────────────────────────────────────
+
+function playScoreClick(isPlus){
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) return;
+    if(!window._scoreAudioCtx) window._scoreAudioCtx=new AC();
+    var ctx=window._scoreAudioCtx;
+    if(ctx.state==="suspended") ctx.resume();
+
+    var osc=ctx.createOscillator();
+    var gain=ctx.createGain();
+    osc.type="sine";
+    osc.frequency.value=isPlus?520:360;
+    gain.gain.setValueAtTime(0.035,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.07);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime+0.07);
+  }catch(e){}
+}
+
 function bindEvents(){
   document.querySelectorAll("[data-fontsize]").forEach(function(b){
     b.addEventListener("click",function(){
@@ -1534,10 +1603,10 @@ function bindEvents(){
   document.querySelectorAll("[data-act]").forEach(function(el){
     el.addEventListener("click",function(){
       var a=el.getAttribute("data-act"),id=el.getAttribute("data-id");
-      if(a==="inc1"){scorePulse={id:id,side:1};bump(id,1,1);}
-      else if(a==="dec1"){scorePulse={id:id,side:1};bump(id,1,-1);}
-      else if(a==="inc2"){scorePulse={id:id,side:2};bump(id,2,1);}
-      else if(a==="dec2"){scorePulse={id:id,side:2};bump(id,2,-1);}
+      if(a==="inc1"){playScoreClick(true);scorePulse={id:id,side:1};bump(id,1,1);}
+      else if(a==="dec1"){playScoreClick(false);scorePulse={id:id,side:1};bump(id,1,-1);}
+      else if(a==="inc2"){playScoreClick(true);scorePulse={id:id,side:2};bump(id,2,1);}
+      else if(a==="dec2"){playScoreClick(false);scorePulse={id:id,side:2};bump(id,2,-1);}
       setTimeout(function(){scorePulse=null;},300);
     });
   });
