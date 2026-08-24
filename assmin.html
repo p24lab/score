@@ -15,7 +15,7 @@
   --muted:#b8bec5;
   --line:#5a6169;
   --gold:#e8b94b;
-  --app-font-size:16px;
+  --app-font-size:18px;
   font-family:Arial,sans-serif;
 }
 *{box-sizing:border-box}
@@ -71,7 +71,7 @@ body{margin:0;background:var(--bg);padding:0;color:#111}
   background:var(--surface2);
   color:var(--text);
   font-size:var(--app-font-size);
-  font-weight:700;
+  font-weight:400;
 }
 .preset-btn.active{
   background:rgba(232,185,75,.14);
@@ -207,7 +207,7 @@ body{margin:0;background:var(--bg);padding:0;color:#111}
 
 /* Shared typography baseline */
 body,button,input,select,textarea,a{
-  font-size:var(--app-font-size,16px);
+  font-size:var(--app-font-size,18px);
   line-height:1.35;
 }
 button,input,select,textarea{font-family:inherit}
@@ -220,8 +220,33 @@ button,input,select,textarea{font-family:inherit}
 .default-summary,
 .actions .btn,
 .actions button{
-  font-size:var(--app-font-size,16px)!important;
+  font-size:var(--app-font-size,18px)!important;
   line-height:1.35!important;
+}
+
+
+.schedule-summary{
+  margin-top:10px;
+  color:#fff;
+  
+  
+  
+}
+
+
+/* Normal text uses one shared typography baseline */
+.schedule-summary,
+.preview,
+.settings-preview,
+.time-preview,
+.rule-desc,
+.default-summary,
+.field-id-inline,
+.actions .btn,
+.actions button{
+  font-size:inherit!important;
+  line-height:inherit!important;
+  font-weight:inherit!important;
 }
 
 </style>
@@ -312,6 +337,40 @@ function resetForm(){
 }
 
 
+
+function adminScheduleSummary(){
+  const teams=formState.teamCount;
+  const rule=formState.rule;
+  const budget=formState.totalBudget;
+  const game=formState.gameMins;
+  const brk=formState.breakMins;
+
+  if(rule==="A" || rule==="B"){
+    let n=0;
+    while(true){
+      const next=n+1;
+      const used=next*game+Math.max(0,next-1)*brk;
+      if(used>budget) break;
+      n=next;
+      if(n>300) break;
+    }
+    const used=n*game+Math.max(0,n-1)*brk;
+    const gamesPerTeam=(n*2)/teams;
+    const g=Number.isInteger(gamesPerTeam)?gamesPerTeam:gamesPerTeam.toFixed(1);
+    return "เล่นทีมละ "+g+" เกม / รวม "+used+" นาที / เหลือ "+Math.max(0,budget-used)+" นาที";
+  }
+
+  /* C = เล่นตามตาราง + นัดชิง */
+  const groupMatches=(teams*(teams-1)/2)*2;
+  const groupTime=groupMatches*game;
+  const playoffMatches=teams===4?2:1;
+  const gaps=Math.max(0,groupMatches+playoffMatches-1);
+  const remain=Math.max(0,budget-(groupTime+gaps*brk));
+  const gamesPerTeam=(groupMatches*2)/teams+1;
+  const g=Number.isInteger(gamesPerTeam)?gamesPerTeam:gamesPerTeam.toFixed(1);
+  return "เล่นทีมละ "+g+" เกม / รวม "+budget+" นาที / เหลือ "+remain+" นาทีสำหรับรอบชิง";
+}
+
 function renderAdminSettings(){
   const box=document.getElementById("adminSettings");
   if(!box) return;
@@ -344,7 +403,8 @@ function renderAdminSettings(){
         '<input class="compact-num" id="adminBreakMins" inputmode="numeric" value="'+formState.breakMins+'">'+
         '<button type="button" class="step-btn" data-admin-step="break" data-delta="1">+</button>'+
       '</div></div>'+
-    '</div>';
+    '</div>'+
+    '<div class="schedule-summary">'+adminScheduleSummary()+'</div>';
 
   box.querySelectorAll("[data-admin-team]").forEach(b=>b.addEventListener("click",()=>{
     formState.teamCount=parseInt(b.dataset.adminTeam,10);

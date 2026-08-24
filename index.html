@@ -1464,7 +1464,7 @@ table.standings th,table.standings td,.tcell,
 
 /* Shared typography baseline */
 body,button,input,select,textarea,a{
-  font-size:var(--app-font-size,16px);
+  font-size:var(--app-font-size,18px);
   line-height:1.35;
 }
 button,input,select,textarea{font-family:inherit}
@@ -1477,8 +1477,41 @@ button,input,select,textarea{font-family:inherit}
 .default-summary,
 .actions .btn,
 .actions button{
-  font-size:var(--app-font-size,16px)!important;
+  font-size:var(--app-font-size,18px)!important;
   line-height:1.35!important;
+}
+
+
+/* Divider above schedule calculation summary */
+.schedule-summary,
+.settings-preview,
+.time-preview{
+  border-top:1px solid rgba(255,255,255,.12);
+  padding-top:10px;
+  margin-top:10px;
+}
+
+
+.preview{
+  border-top:1px solid rgba(255,255,255,.12);
+  padding-top:10px;
+  margin-top:10px;
+}
+
+
+/* Normal text uses one shared typography baseline */
+.schedule-summary,
+.preview,
+.settings-preview,
+.time-preview,
+.rule-desc,
+.default-summary,
+.field-id-inline,
+.actions .btn,
+.actions button{
+  font-size:inherit!important;
+  line-height:inherit!important;
+  font-weight:inherit!important;
 }
 
 </style>
@@ -1683,7 +1716,7 @@ async function pollRemote(){
 // ── setup state ────────────────────────────────────────────────────────────────
 var setupMode="preset150",setupBudget=150,setupCustomMins=150,setupBreak=2;
 var setupGameMins=8;
-var setupFontSize=16;
+var setupFontSize=18;
 var scorePulse=null;
 var currentTab="schedule";
 
@@ -2013,13 +2046,9 @@ function renderSettingsTab(){
           :'เล่นทีมละ '+(((c.sched.groupMatches*2)/setupTeamCount)+1)+' เกม / รวม '+c.budget+' นาที / เหลือ '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาทีสำหรับรอบชิง')+
       '</div>'+
     '</div>'+
-    '<div class="settings-section"><h2>ขนาดตัวหนังสือ</h2><div class="preset-row">'+
-      '<button class="preset-btn'+(setupFontSize===14?' active':'')+'" data-fontsize="14">เล็ก</button>'+
-      '<button class="preset-btn'+(setupFontSize===15?' active':'')+'" data-fontsize="15">กลาง</button>'+
-      '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
-    '</div></div>'+
+    ''+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.39</div>'+
+    '<div class="app-version">v47.42</div>'+
     '</div>';
 }
 
@@ -2215,13 +2244,7 @@ function bindEvents(){
       ensureScoreAudio();
     },{capture:true,once:true,passive:true});
   });
-  document.querySelectorAll("[data-fontsize]").forEach(function(b){
-    b.addEventListener("click",function(){
-      setupFontSize=parseInt(b.getAttribute("data-fontsize"),10)||15;
-      try{localStorage.setItem("tournament_font_size",String(setupFontSize));}catch(e){}
-      render();
-    });
-  });
+  
   document.querySelectorAll("[data-tab]").forEach(function(b){b.addEventListener("click",function(){currentTab=b.getAttribute("data-tab");render();});});
   document.querySelectorAll("[data-teamcount]").forEach(function(b){b.addEventListener("click",function(){
     setupTeamCount=parseInt(b.getAttribute("data-teamcount"),10)||4;
