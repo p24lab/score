@@ -370,10 +370,10 @@ async function load(){
     const defs=normalizeDefaults(x.data&&x.data.fieldDefaults);
     const isDisabled=!!(x.data&&x.data.disabled);
     div.innerHTML='<div class="item-top"><div><div class="field-title-line"><span class="code">'+esc(name||"ยังไม่ได้ตั้งชื่อสนาม")+'</span><span class="field-id-inline">/ ID '+esc(x.id)+'</span>'+(isDisabled?'<span class="status-pill off">ปิดใช้งาน</span>':'')+'</div><div class="default-summary">'+esc(defaultText(defs))+'</div></div></div>'+
-      '<div class="actions"><a class="btn" href="'+url+'" target="_blank">เปิดสนาม</a>'+
-      '<button data-copy="'+url+'">คัดลอกลิงก์</button>'+
+      '<div class="actions"><a class="btn" href="'+url+'" target="_blank">เปิด</a>'+
+      '<button data-copy="'+url+'">คัดลอก</button>'+
       '<button data-edit="'+esc(x.id)+'" data-name="'+esc(name)+'">แก้ไข</button>'+
-      '<button data-toggle="'+esc(x.id)+'" data-disabled="'+(isDisabled?'1':'0')+'">'+(isDisabled?'เปิดใช้งาน':'ปิดใช้งาน')+'</button>'+
+      '<button data-toggle="'+esc(x.id)+'" data-disabled="'+(isDisabled?'1':'0')+'">'+(isDisabled?'เปิด':'ปิด')+'</button>'+
       '<button class="danger" data-delete="'+esc(x.id)+'" data-name="'+esc(name)+'">ลบ</button></div>';
     list.appendChild(div);
   });
