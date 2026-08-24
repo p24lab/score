@@ -1351,6 +1351,116 @@ table.standings th,table.standings td,.tcell,
   color:var(--gold)!important;
 }
 
+
+.rule-desc{
+  margin-top:7px;
+  color:var(--muted);
+  line-height:1.35;
+  font-size:calc(var(--app-font-size) * .88)!important;
+}
+
+
+.rule-desc{
+  color:#fff!important;
+  opacity:1!important;
+}
+
+
+.rule-desc{
+  font-size:var(--app-font-size)!important;
+  font-weight:400!important;
+  line-height:1.4!important;
+}
+
+
+.team-count-row{
+  margin:7px 0 12px!important;
+}
+.color-picker-card .color-heading{
+  margin-top:14px!important;
+}
+
+
+/* Keep the first content heading stable when switching tabs */
+.settings-card,
+.color-picker-card{
+  padding-top:16px!important;
+}
+.settings-team-section h2,
+.color-picker-card > h2:first-child{
+  margin-top:0!important;
+}
+
+
+/* align "จำนวนทีม" with "เลือกสี" more precisely */
+.settings-card{
+  padding-top:10px!important;
+}
+.settings-team-section{
+  margin-top:0!important;
+  padding-top:0!important;
+}
+.settings-team-section h2{
+  margin-top:0!important;
+}
+
+
+/* Same top spacing for "จำนวนทีม" and "เลือกสี" */
+.settings-card,
+.color-picker-card{
+  padding-top:16px!important;
+}
+.settings-team-section{
+  margin-top:0!important;
+  padding-top:0!important;
+}
+.settings-team-section h2,
+.color-picker-card > h2:first-child{
+  margin-top:0!important;
+}
+
+/* Rule A schedule note */
+
+
+/* Rule buttons: allow long labels to wrap instead of overflowing */
+.settings-section .preset-row .preset-btn{
+  white-space:normal!important;
+  line-height:1.2!important;
+  min-height:36px!important;
+  height:auto!important;
+  padding:7px 8px!important;
+  overflow-wrap:anywhere;
+  text-align:center!important;
+}
+@media(max-width:430px){
+  .settings-section .preset-row{
+    align-items:stretch!important;
+  }
+  .settings-section .preset-row .preset-btn{
+    flex:1 1 100%!important;
+    width:100%!important;
+  }
+}
+
+
+.maintenance{
+  max-width:720px;
+  margin:18px auto;
+  padding:0 10px;
+}
+.maintenance-card{
+  background:var(--surface);
+  color:#fff;
+  border-radius:10px;
+  padding:22px 16px;
+  text-align:center;
+}
+.maintenance-card h2{
+  margin:0;
+  font-size:calc(var(--app-font-size) * 1.35)!important;
+  font-weight:800;
+}
+
 </style>
 </head>
 <body>
@@ -1380,7 +1490,52 @@ var TEAMS={
 };
 var COLOR_OPTIONS=["R","B","W","Y","G","P"];
 var setupTeamCount=4;
+var setupRule="A";
 var selectedColors=["R","B","W","Y"];
+
+/* Rules are designed/maintained by the admin/developer.
+   Players only choose an available rule when creating a tournament. */
+var RULES={
+  A:{name:"เล่น 2 เกมติด",description:"เล่น 2 เกมติดกัน แล้วพัก วนไปเรื่อยๆ จนครบเวลา",supportedTeams:[3,4]},
+  B:{name:"เล่นตามตาราง",description:"เล่นตามตาราง จนครบเวลา",supportedTeams:[3,4]},
+  C:{name:"เล่นตามตาราง+นัดชิง",description:"เล่นตามตาราง / ลำดับ1 2 ชิงที่1 / ลำดับ3 4 ชิงที่3",supportedTeams:[4]}
+};
+function availableRules(){
+  return Object.keys(RULES).filter(function(k){
+    return RULES[k].supportedTeams.indexOf(setupTeamCount)>=0;
+  });
+}
+function normalizeRule(){
+  var a=availableRules();
+  if(a.indexOf(setupRule)<0) setupRule=a[0]||"A";
+}
+
+function getFieldDefaults(){
+  var d=(state&&state.fieldDefaults)||{};
+  return{
+    teamCount:(d.teamCount===3?3:4),
+    rule:(d.rule||"B"),
+    totalBudget:Math.max(60,parseInt(d.totalBudget,10)||150),
+    gameMins:Math.max(1,parseInt(d.gameMins,10)||8),
+    breakMins:Math.max(0,parseInt(d.breakMins,10)||2)
+  };
+}
+function applyFieldDefaults(){
+  var d=getFieldDefaults();
+  setupTeamCount=d.teamCount;
+  setupRule=d.rule;
+  normalizeRule();
+  setupGameMins=d.gameMins;
+  setupBreak=d.breakMins;
+
+  var durationMap={90:"preset90",120:"preset120",150:"preset150",180:"preset180"};
+  setupBudget=[90,120,150,180].indexOf(d.totalBudget)>=0?d.totalBudget:150;
+  setupCustomMins=setupBudget;
+  setupMode=durationMap[setupBudget]||"preset150";
+
+  selectedColors=setupTeamCount===4?["R","B","W","Y"]:["R","B","W"];
+}
+
 function activeTeams(){return selectedColors.slice(0,setupTeamCount);}
 function allPairsForTeams(teams){var out=[];for(var i=0;i<teams.length;i++)for(var j=i+1;j<teams.length;j++)out.push([teams[i],teams[j]]);return out;}
 
@@ -1446,6 +1601,7 @@ async function loadState(){
   }catch(e){
     console.warn("Supabase load failed",e);
   }
+  if(state && !state.started) applyFieldDefaults();
 }
 
 function scheduleSave(){
@@ -1486,10 +1642,14 @@ async function pollRemote(){
       var remote=res.data.data;
       if(!state||(remote.updatedAt||0)>(state.updatedAt||0)){
         state=remote;
-        if(state&&state.matches){
+        if(state&&state.started&&state.matches){
           setupTeamCount=state.teamCount||4;
+          setupRule=state.rule||"A";normalizeRule();
           setupGameMins=state.gameMins||8;
+          setupBreak=Number.isFinite(state.breakMins)?state.breakMins:2;
           if(state.teamColors&&state.teamColors.length) selectedColors=state.teamColors.slice();
+        }else if(state&&!state.started){
+          applyFieldDefaults();
         }
         try{localStorage.setItem(SK+"_"+REMOTE_ID,JSON.stringify(state));}catch(e){}
         render();
@@ -1510,6 +1670,39 @@ var currentTab="schedule";
 function suggestBreak(b){var v=Math.floor((b-112)/13);return Math.max(0,Math.min(6,v));}
 function computeSched(budget,brk){
   var teams=setupTeamCount;
+
+  /* Rule A: loop continuously with the Rule A rotation, no playoff. */
+  if(setupRule==="A" && (teams===3 || teams===4)){
+    var perGame=setupGameMins;
+    var n=0;
+    while(true){
+      var next=n+1;
+      var used=next*perGame+Math.max(0,next-1)*brk;
+      if(used>budget) break;
+      n=next;
+      if(n>300) break;
+    }
+    var usedA=n*perGame+Math.max(0,n-1)*brk;
+    return{gf:n*perGame,gaps:Math.max(0,n-1),rem:Math.max(0,budget-usedA),insuf:n<1,
+      groupMatches:n,thirdMin:0,finalMin:0,noPlayoff:true,used:usedA};
+  }
+
+  /* Rule C: fixed table rotation, then continue the same balanced rotation until time is full. */
+  if(setupRule==="B" && (teams===3 || teams===4)){
+    var nC=0;
+    while(true){
+      var nextC=nC+1;
+      var usedC=nextC*setupGameMins+Math.max(0,nextC-1)*brk;
+      if(usedC>budget) break;
+      nC=nextC;
+      if(nC>300) break;
+    }
+    var totalUsedC=nC*setupGameMins+Math.max(0,nC-1)*brk;
+    return{gf:nC*setupGameMins,gaps:Math.max(0,nC-1),rem:Math.max(0,budget-totalUsedC),insuf:nC<1,
+      groupMatches:nC,thirdMin:0,finalMin:0,noPlayoff:true,used:totalUsedC};
+  }
+
+  /* Rule B: existing 4-team table + playoffs. */
   var groupMatches=(teams*(teams-1)/2)*2;
   var gf=groupMatches*setupGameMins;
   var playoffMatches=teams===4?2:1;
@@ -1520,28 +1713,100 @@ function computeSched(budget,brk){
   var insuf=rem<minPlayoff;
   if(teams===4){
     var each=insuf?8:Math.floor(rem/2);
-    return{gf:gf,gaps:gaps,rem:rem,insuf:insuf,groupMatches:groupMatches,thirdMin:each,finalMin:each+(!insuf&&rem%2?1:0)};
+    return{gf:gf,gaps:gaps,rem:rem,insuf:insuf,groupMatches:groupMatches,thirdMin:each,
+      finalMin:each+(!insuf&&rem%2?1:0),noPlayoff:false};
   }
-  return{gf:gf,gaps:gaps,rem:rem,insuf:insuf,groupMatches:groupMatches,thirdMin:0,finalMin:insuf?8:rem};
+  return{gf:gf,gaps:gaps,rem:rem,insuf:insuf,groupMatches:groupMatches,thirdMin:0,
+    finalMin:insuf?8:rem,noPlayoff:false};
 }
 
 // ── actions ────────────────────────────────────────────────────────────────────
+
+function ruleAOrder4(teams,count){
+  var A=teams[0],B=teams[1],C=teams[2],D=teams[3];
+
+  /* Rule A, 4 teams:
+     1 A-B
+     2 A-C  -> A completes 2 consecutive games
+     3 D-C  -> C completes 2 consecutive games
+     4 D-B  -> D completes 2 consecutive games
+
+     Then repeat. Across every 4-match block all four teams play 2 games. */
+  var cycle=[
+    [A,B],
+    [A,C],
+    [D,C],
+    [D,B]
+  ];
+
+  var out=[];
+  for(var i=0;i<count;i++) out.push(cycle[i%cycle.length].slice());
+  return out;
+}
+
+
+function ruleCOrder(teams,count){
+  var cycle;
+  if(teams.length===3){
+    /* each complete 3-match cycle gives every team 2 games */
+    cycle=[
+      [teams[0],teams[1]],
+      [teams[0],teams[2]],
+      [teams[1],teams[2]]
+    ];
+  }else{
+    /* all 6 unique pairings once per cycle; every team plays 3 games per cycle */
+    cycle=[
+      [teams[0],teams[1]],
+      [teams[2],teams[3]],
+      [teams[0],teams[2]],
+      [teams[1],teams[3]],
+      [teams[0],teams[3]],
+      [teams[1],teams[2]]
+    ];
+  }
+  var out=[];
+  for(var i=0;i<count;i++) out.push(cycle[i%cycle.length].slice());
+  return out;
+}
+
 async function startTournament(){
-  var budget=setupMode==="custom"?setupCustomMins:setupBudget;
+  var budget=setupBudget;
   var brk=setupBreak;
   var sched=computeSched(budget,brk);
   var teams=activeTeams();
   if(teams.length!==setupTeamCount){alert("กรุณาเลือกสีให้ครบตามจำนวนทีม");return;}
-  var first=[teams[0],teams[1]];
-  var order=findSchedule(first);
-  if(!order){alert("ไม่สามารถสร้างตารางการแข่งขันได้");return;}
   var matches=[];
-  order.forEach(function(p,i){
-    matches.push({id:"g"+i,stage:"group",team1:p[0],team2:p[1],dur:setupGameMins,s1:0,s2:0,played:false});
-  });
-  if(setupTeamCount===4) matches.push({id:"third",stage:"third",dur:sched.thirdMin,s1:0,s2:0,played:false});
-  matches.push({id:"final",stage:"final",dur:sched.finalMin,s1:0,s2:0,played:false});
-  state={started:true,fieldName:(state&&state.fieldName)||FIELD_NAME||REMOTE_ID,teamCount:setupTeamCount,teamColors:teams.slice(),startTime:Date.now(),totalBudget:budget,breakMins:brk,gameMins:setupGameMins,sched,matches,updatedAt:Date.now()};
+
+  if(setupRule==="A" && setupTeamCount===3){
+    /* 3 teams: A-B → A-C → B-C, repeating */
+    var A=teams[0],B=teams[1],C=teams[2];
+    var cycle=[[A,B],[A,C],[B,C]];
+    for(var i=0;i<sched.groupMatches;i++){
+      var p=cycle[i%3];
+      matches.push({id:"g"+i,stage:"group",team1:p[0],team2:p[1],dur:setupGameMins,s1:0,s2:0,played:false});
+    }
+  }else if(setupRule==="A" && setupTeamCount===4){
+    var orderA=ruleAOrder4(teams,sched.groupMatches);
+    orderA.forEach(function(p,i){
+      matches.push({id:"g"+i,stage:"group",team1:p[0],team2:p[1],dur:setupGameMins,s1:0,s2:0,played:false});
+    });
+  }else if(setupRule==="B"){
+    var orderC=ruleCOrder(teams,sched.groupMatches);
+    orderC.forEach(function(p,i){
+      matches.push({id:"g"+i,stage:"group",team1:p[0],team2:p[1],dur:setupGameMins,s1:0,s2:0,played:false});
+    });
+  }else{
+    var first=[teams[0],teams[1]];
+    var order=findSchedule(first);
+    if(!order){alert("ไม่สามารถสร้างตารางการแข่งขันได้");return;}
+    order.forEach(function(p,i){
+      matches.push({id:"g"+i,stage:"group",team1:p[0],team2:p[1],dur:setupGameMins,s1:0,s2:0,played:false});
+    });
+    if(setupTeamCount===4) matches.push({id:"third",stage:"third",dur:sched.thirdMin,s1:0,s2:0,played:false});
+    matches.push({id:"final",stage:"final",dur:sched.finalMin,s1:0,s2:0,played:false});
+  }
+  state={started:true,fieldName:(state&&state.fieldName)||FIELD_NAME||REMOTE_ID,fieldDefaults:(state&&state.fieldDefaults)||null,disabled:(state&&state.disabled)||false,rule:setupRule,teamCount:setupTeamCount,teamColors:teams.slice(),startTime:Date.now(),totalBudget:budget,breakMins:brk,gameMins:setupGameMins,sched,matches,updatedAt:Date.now()};
   currentTab="schedule";
   render();savePending=true;flushSave();
 }
@@ -1585,14 +1850,15 @@ async function doReset(){
   if(saveTimer){clearTimeout(saveTimer);saveTimer=null;}
   savePending=false;syncFailed=false;
   var keepFieldName=(state&&state.fieldName)||FIELD_NAME||REMOTE_ID;
-  state=null;
-  selectedColors=setupTeamCount===4?["R","B","W","Y"]:["R","B","W"];
-  try{localStorage.removeItem(SK+"_"+REMOTE_ID);}catch(e){}
+  var keepDefaults=(state&&state.fieldDefaults)||null;
+  state={started:false,fieldName:keepFieldName,fieldDefaults:keepDefaults,disabled:(state&&state.disabled)||false,updatedAt:Date.now()};
+  applyFieldDefaults();
+  try{localStorage.setItem(SK+"_"+REMOTE_ID,JSON.stringify(state));}catch(e){}
   render();
 
   if(sb){
     try{
-      var resetState={started:false,fieldName:keepFieldName,updatedAt:Date.now()};
+      var resetState={started:false,fieldName:keepFieldName,fieldDefaults:keepDefaults,disabled:(state&&state.disabled)||false,updatedAt:Date.now()};
       var res=await sb.from("tournament_state").upsert({
         id:REMOTE_ID,
         data:resetState,
@@ -1637,6 +1903,12 @@ function nextUpId(matches){
 function render(){
   document.documentElement.style.setProperty("--app-font-size",setupFontSize+"px");
   var app=document.getElementById("app");
+
+  if(state&&state.disabled){
+    app.innerHTML='<div class="maintenance"><div class="maintenance-card"><h2>ปรับปรุงระบบ</h2></div></div>';
+    return;
+  }
+
   if(!state||!state.started) currentTab=currentTab||"schedule";
   app.innerHTML=renderTabs()+(currentTab==="schedule"?renderScheduleTab():renderSettingsTab());
   bindEvents();
@@ -1656,7 +1928,7 @@ function safeDuration(mins){
   return Math.floor(mins/60)+':'+String(mins%60).padStart(2,'0');
 }
 function currentConfig(){
-  var budget=state&&state.started?state.totalBudget:(setupMode==="custom"?setupCustomMins:setupBudget);
+  var budget=state&&state.started?state.totalBudget:setupBudget;
   var brk=state&&state.started?state.breakMins:setupBreak;
   var sched=state&&state.started?state.sched:computeSched(budget,brk);
   return{budget:budget,brk:brk,sched:sched};
@@ -1686,10 +1958,18 @@ function renderSettingsTab(){
 
   return '<div class="settings-page-heading">การตั้งค่า</div>'+
     '<div class="settings-card">'+
-    summaryHTML()+
-    '<div class="settings-section"><h2>จำนวนทีม</h2><div class="preset-row"><button class="preset-btn'+(setupTeamCount===3?' active':'')+'" data-teamcount="3"'+(started?' disabled':'')+'>3 ทีม</button><button class="preset-btn'+(setupTeamCount===4?' active':'')+'" data-teamcount="4"'+(started?' disabled':'')+'>4 ทีม</button></div></div>'+
-    '<div class="settings-section"><h2>ตั้งเวลาการแข่งขัน</h2><div class="preset-row">'+pBtn("preset120","2:00 ชม.")+pBtn("preset150","2:30 ชม.")+pBtn("custom","กำหนดเอง")+'</div>'+
-      (setupMode==="custom"?'<div class="custom-row"><label style="font-size:12.5px;color:var(--muted);">เวลารวม (นาที)</label><input type="number" min="60" step="5" class="num-input" id="customMins" value="'+setupCustomMins+'"'+(started?' disabled':'')+'></div>':'')+preview+'</div>'+
+    '<div class="settings-section settings-team-section"><h2>จำนวนทีม</h2><div class="preset-row"><button class="preset-btn'+(setupTeamCount===3?' active':'')+'" data-teamcount="3"'+(started?' disabled':'')+'>3 ทีม</button><button class="preset-btn'+(setupTeamCount===4?' active':'')+'" data-teamcount="4"'+(started?' disabled':'')+'>4 ทีม</button></div></div>'+
+    
+    '<div class="settings-section"><h2>กติกาการแข่งขัน</h2>'+
+      '<div class="preset-row">'+availableRules().map(function(k){return '<button class="preset-btn'+(setupRule===k?' active':'')+'" data-rule="'+k+'"'+(started?' disabled':'')+'>'+RULES[k].name+'</button>';}).join('')+'</div>'+
+      '<div class="rule-desc">'+(RULES[setupRule]?RULES[setupRule].description:'')+'</div>'+
+    '</div>'+
+    '<div class="settings-section"><h2>ระยะเวลาการแข่งขัน</h2><div class="preset-row">'+
+      pBtn("preset90","1.5 ชม.")+
+      pBtn("preset120","2 ชม.")+
+      pBtn("preset150","2.5 ชม.")+
+      pBtn("preset180","3 ชม.")+
+      '</div>'+preview+'</div>'+
     '<div class="settings-section"><h2>ตั้งเวลา</h2>'+
       '<div class="time-setting-row">'+
         '<span>เล่นเกมละ (นาที)</span>'+
@@ -1707,7 +1987,11 @@ function renderSettingsTab(){
           '<button type="button" class="step-btn" data-step="break" data-delta="1"'+(started?' disabled':'')+'>+</button>'+
         '</div>'+
       '</div>'+
-      '<div class="time-calc-line">จะใช้เวลา '+(c.sched.gf+c.sched.gaps*c.brk)+' นาที / เหลือประมาณ '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาที<br>สำหรับนัดชิงที่1 และ ที่3</div>'+
+      '<div class="time-calc-line">'+
+        (((setupRule==="A"||setupRule==="B")&&(setupTeamCount===3||setupTeamCount===4))
+          ?'จะได้เล่นทีมละ '+((c.sched.groupMatches*2)/setupTeamCount).toFixed(((c.sched.groupMatches*2)%setupTeamCount)?1:0)+' เกม / รวม '+(c.sched.used||0)+' นาที / เหลือ '+c.sched.rem+' นาที'
+          :'จะได้เล่นทีมละ '+(((c.sched.groupMatches*2)/setupTeamCount)+1)+' เกม / รวม '+c.budget+' นาที / เหลือ '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาทีสำหรับรอบชิง')+
+      '</div>'+
     '</div>'+
     '<div class="settings-section"><h2>ขนาดตัวหนังสือ</h2><div class="preset-row">'+
       '<button class="preset-btn'+(setupFontSize===14?' active':'')+'" data-fontsize="14">เล็ก</button>'+
@@ -1715,7 +1999,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.10</div>'+
+    '<div class="app-version">v47.36</div>'+
     '</div>';
 }
 
@@ -1734,7 +2018,7 @@ function renderScheduleTab(){
       '<div class="hint">เลือก '+setupTeamCount+' สีตามจำนวนทีม • ลำดับที่ 1 และ 2 จะเป็นคู่ที่เล่นนัดแรก</div>'+
       '<div class="color-picker">'+colorTiles+'</div>'+
       '<div class="vs-badge">เลือกแล้ว '+selectedColors.length+'/'+setupTeamCount+(firstText?'  +  '+firstText:'')+'</div>'+
-      '<button class="btn-primary" id="startBtn"'+(!complete||computeSched(setupMode==="custom"?setupCustomMins:setupBudget,setupBreak).insuf?' disabled':'')+'>สร้างตารางและเริ่มการแข่งขัน</button>'+
+      '<button class="btn-primary" id="startBtn"'+(!complete||computeSched(setupBudget,setupBreak).insuf?' disabled':'')+'>สร้างตารางและเริ่มการแข่งขัน</button>'+
       '</div>';
   }
   var matches=state.matches;
@@ -1753,14 +2037,18 @@ function renderScheduleTab(){
   html+='<div class="match-list">';
   groupMatches.forEach(function(m){html+=renderMatchWrap(m,false,null,null,false);});
   html+='</div>';
-  html+='<div class="sec">รอบเพลย์ออฟ</div>';
-  var thirdM=matches.find(function(m){return m.id==="third";}),finalM=matches.find(function(m){return m.id==="final";});
-  if(thirdM&&st.length>=4){
-    html+='<div class="playoff-meta">ชิงที่ 3 • เล่น '+thirdM.dur+' นาที</div>';
-    html+=renderMatchWrap(thirdM,false,st[2].code,st[3].code,true);
+  if((state.teamCount||4)===4 && (state.rule||"A")==="C"){
+    html+='<div class="sec">รอบเพลย์ออฟ</div>';
+    var thirdM=matches.find(function(m){return m.id==="third";}),finalM=matches.find(function(m){return m.id==="final";});
+    if(thirdM&&st.length>=4){
+      html+='<div class="playoff-meta">ชิงที่ 3 • เล่น '+thirdM.dur+' นาที</div>';
+      html+=renderMatchWrap(thirdM,false,st[2].code,st[3].code,true);
+    }
+    if(finalM){
+      html+='<div class="playoff-meta">ชิงที่ 1 • เล่น '+finalM.dur+' นาที</div>';
+      html+=renderMatchWrap(finalM,false,st[0].code,st[1].code,true);
+    }
   }
-  html+='<div class="playoff-meta">ชิงที่ 1 • เล่น '+finalM.dur+' นาที</div>';
-  html+=renderMatchWrap(finalM,false,st[0].code,st[1].code,true);
   return html;
 }
 
@@ -1930,13 +2218,17 @@ function bindEvents(){
   document.querySelectorAll("[data-preset]").forEach(function(b){
     b.addEventListener("click",function(){
       setupMode=b.getAttribute("data-preset");
-      if(setupMode==="preset120") setupBudget=120;
-      if(setupMode==="preset150") setupBudget=150;
+      var map={preset90:90,preset120:120,preset150:150,preset180:180};
+      setupBudget=map[setupMode]||150;
+      setupCustomMins=setupBudget;
       render();
     });
   });
   var ci=document.getElementById("customMins");
   if(ci) ci.addEventListener("input",function(){setupCustomMins=parseInt(ci.value||"0")||0;render();});
+  document.querySelectorAll("[data-rule]").forEach(function(b){
+    b.addEventListener("click",function(){setupRule=b.getAttribute("data-rule")||"A";render();});
+  });
   var gi=document.getElementById("gameMinsInput");
   if(gi) gi.addEventListener("change",function(){
     setupGameMins=Math.max(1,Math.min(60,parseInt(gi.value||"8")||8));
@@ -2005,7 +2297,14 @@ async function init(){
   if(state&&state.matches){
     state.matches.forEach(function(m){if(typeof m.played!=="boolean")m.played=(m.s1!==0||m.s2!==0);});
     setupTeamCount=state.teamCount||4;
+    setupRule=state.rule||"A";normalizeRule();
     setupGameMins=state.gameMins||8;
+    setupBreak=Number.isFinite(state.breakMins)?state.breakMins:2;
+    var tb=parseInt(state.totalBudget,10)||150;
+    var durationMap={90:"preset90",120:"preset120",150:"preset150",180:"preset180"};
+    setupBudget=[90,120,150,180].indexOf(tb)>=0?tb:150;
+    setupCustomMins=setupBudget;
+    setupMode=durationMap[setupBudget]||"preset150";
     if(state.teamColors&&state.teamColors.length) selectedColors=state.teamColors.slice();
   }
   currentTab="schedule";

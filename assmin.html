@@ -5,62 +5,242 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SCORE Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{font-family:Arial,sans-serif;color:#111;background:#d9dde1}
-*{box-sizing:border-box}
-body{margin:0;padding:14px;background:#d9dde1}
-.wrap{max-width:720px;margin:auto}
-h1{margin:0 0 12px;font-size:22px}
-.card{background:#343a40;color:#fff;border-radius:10px;padding:14px;margin-bottom:12px}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-input{flex:1;min-width:180px;padding:11px 12px;border-radius:7px;border:1px solid #666;font-size:16px}
-button{padding:11px 14px;border-radius:7px;border:1px solid #777;background:#454c54;color:#fff;font-size:16px;font-weight:700}
-button.primary{border-color:#facc15}
-button.danger{opacity:.72}
-.list{display:grid;gap:8px}
-.item{background:#343a40;color:#fff;border-radius:10px;padding:12px}
-.item-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.code{font-weight:800}
-.muted{opacity:.65;font-size:13px}
-.actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
-a.btn{display:inline-block;padding:8px 10px;border-radius:7px;background:#454c54;color:#fff;text-decoration:none;font-weight:700}
-.status{margin-top:8px;font-size:13px;opacity:.8}
 
-.actions .btn,
-.actions button{
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  height:38px!important;
-  padding:0 10px!important;
-  line-height:1!important;
-  font-family:inherit!important;
-  font-size:16px!important;
-  font-weight:700!important;
-  vertical-align:middle!important;
+<style>
+:root{
+  --bg:#d9dde1;
+  --surface:#343a40;
+  --surface2:#252a2f;
+  --text:#fff;
+  --muted:#b8bec5;
+  --line:#5a6169;
+  --gold:#e8b94b;
+  --app-font-size:16px;
+  font-family:Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);padding:0;color:#111}
+.wrap{width:100%;max-width:720px;margin:0 auto;padding:0 10px}
+.page-title{font-size:22px;font-weight:800;margin:4px 0 10px}
+.card{
+  background:var(--surface);
+  color:var(--text);
+  border-radius:10px;
+  padding:16px;
+  width:100%;
+  margin-bottom:10px;
+}
+.settings-section{
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.settings-section:last-child{border-bottom:0}
+.settings-section h2{
+  margin:0 0 8px;
+  font-size:var(--app-font-size);
+  font-weight:800;
+}
+.field-label{
+  display:block;
+  margin-bottom:6px;
+  font-size:var(--app-font-size);
+  font-weight:800;
+}
+.text-input{
+  width:100%;
+  height:38px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--surface2);
+  color:#fff;
+  padding:0 10px;
+  font-size:var(--app-font-size);
+}
+.preset-row{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.preset-btn{
+  flex:1;
+  min-width:72px;
+  height:34px;
+  padding:0 10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--surface2);
+  color:var(--text);
+  font-size:var(--app-font-size);
+  font-weight:700;
+}
+.preset-btn.active{
+  background:rgba(232,185,75,.14);
+  border-color:var(--gold);
+  color:var(--gold);
+}
+.rule-desc{
+  margin-top:7px;
+  color:#fff;
+  font-size:var(--app-font-size);
+  line-height:1.4;
+}
+.time-setting-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:7px 0;
+}
+.mini-stepper{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+}
+.step-btn{
+  width:28px;
+  height:32px;
+  padding:0;
+  border-radius:7px;
+  border:1px solid var(--line);
+  background:var(--surface2);
+  color:var(--text);
+  font-size:16px;
+  font-weight:800;
+}
+.compact-num{
+  width:34px;
+  height:32px;
+  border:1px solid var(--gold);
+  border-radius:10px;
+  background:rgba(232,185,75,.14);
+  color:var(--gold);
+  text-align:center;
+  font-size:var(--app-font-size);
+  font-weight:700;
+}
+.primary{
+  width:100%;
+  min-height:40px;
+  margin-top:12px;
+  border-radius:7px;
+  border:1px solid var(--gold);
+  background:var(--surface2);
+  color:#fff;
+  font-size:var(--app-font-size);
+  font-weight:800;
+}
+.status{margin-top:8px;font-size:14px;opacity:.8}
+.list{display:grid;gap:8px}
+.item{
+  background:var(--surface);
+  color:#fff;
+  border-radius:10px;
+  padding:12px;
+}
+.field-title-line{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.code{font-size:16px;font-weight:800}
+.field-id-inline{font-size:16px;font-weight:700;color:#fff}
+.default-summary{
+  margin-top:6px;
+  color:#fff;
+  font-size:16px;
+  line-height:1.4;
+}
+.actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.actions .btn,.actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:38px;
+  padding:0 10px;
+  border-radius:7px;
+  border:1px solid #777;
+  background:#454c54;
+  color:#fff;
+  text-decoration:none;
+  font-size:16px;
+  font-weight:700;
+}
+.actions .danger{opacity:.72}
+.edit-hint{margin-top:8px;opacity:.68;font-size:13px}
+@media(max-width:430px){
+  .preset-btn{min-width:58px}
+  .time-setting-row{gap:8px}
+}
+
+/* Rule buttons: allow long labels to wrap instead of overflowing */
+.settings-section .preset-row .preset-btn{
+  white-space:normal!important;
+  line-height:1.2!important;
+  min-height:36px!important;
+  height:auto!important;
+  padding:7px 8px!important;
+  overflow-wrap:anywhere;
+  text-align:center!important;
+}
+@media(max-width:430px){
+  .settings-section .preset-row{
+    align-items:stretch!important;
+  }
+  .settings-section .preset-row .preset-btn{
+    flex:1 1 100%!important;
+    width:100%!important;
+  }
+}
+
+
+.status-pill{
+  display:inline-flex;
+  align-items:center;
+  margin-left:6px;
+  padding:2px 7px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+  background:rgba(255,255,255,.10);
+}
+.status-pill.off{
+  background:rgba(255,193,7,.16);
+  color:#ffd666;
 }
 
 </style>
+
 </head>
 <body>
 <div class="wrap">
-  <h1>SCORE Admin</h1>
+  <div class="page-title">SCORE Admin</div>
+
   <div class="card">
-    <div class="row">
-      <input id="fieldName" placeholder="ชื่อสนาม / ชื่อกลุ่ม">
-      <button class="primary" id="createBtn">สร้างสนาม</button>
+    <div class="settings-section">
+      <label class="field-label" for="fieldName">ชื่อสนาม / ชื่อกลุ่ม</label>
+      <input class="text-input" id="fieldName" placeholder="ชื่อสนาม / ชื่อกลุ่ม">
     </div>
+
+    <div id="adminSettings"></div>
+
+    <button class="primary" id="createBtn">สร้างสนาม/แก้ไข</button>
+    <div class="edit-hint">กด “แก้ไข” ที่รายการสนามเพื่อโหลดค่ามาแก้ในฟอร์มนี้</div>
     <div class="status" id="status"></div>
   </div>
+
   <div class="list" id="list"></div>
 </div>
-
 <script>
 const SUPABASE_URL="https://afngojrtekieyndjzwwa.supabase.co";
 const SUPABASE_KEY="sb_publishable_7PjmLJxgJaobwvuo9bZbNg_u2w227at";
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const list=document.getElementById("list");
 const status=document.getElementById("status");
+
+const RULES={
+  A:{name:"เล่น 2 เกมติด",description:"เล่น 2 เกมติดกัน แล้วพัก วนไปเรื่อยๆ จนครบเวลา",supportedTeams:[3,4]},
+  B:{name:"เล่นตามตาราง",description:"เล่นตามตาราง จนครบเวลา",supportedTeams:[3,4]},
+  C:{name:"เล่นตามตาราง+นัดชิง",description:"เล่นตามตาราง / ลำดับ1 2 ชิงที่1 / ลำดับ3 4 ชิงที่3",supportedTeams:[4]}
+};
+
+let formState={teamCount:4,rule:"C",totalBudget:150,gameMins:8,breakMins:2};
+
 
 function code(){
   const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -69,6 +249,113 @@ function code(){
   return s;
 }
 function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+function normalizeDefaults(d){
+  d=d||{};
+  let teamCount=Number(d.teamCount)===3?3:4;
+  let rule=(d.rule==="A"||d.rule==="B"||d.rule==="C")?d.rule:"C";
+  if(teamCount===3&&rule==="C") rule="A";
+  let totalBudget=[90,120,150,180].includes(parseInt(d.totalBudget,10))?parseInt(d.totalBudget,10):150;
+  return{
+    teamCount,
+    rule,
+    totalBudget,
+    gameMins:Math.max(1,parseInt(d.gameMins,10)||8),
+    breakMins:Math.max(0,Math.min(10,parseInt(d.breakMins,10)||2))
+  };
+}
+function readCreateDefaults(){
+  return normalizeDefaults(formState);
+}
+function defaultText(d){
+  d=normalizeDefaults(d);
+  const hourText={90:"1.5 ชม.",120:"2 ชม.",150:"2.5 ชม.",180:"3 ชม."}[d.totalBudget];
+  return d.teamCount+" ทีม • "+(RULES[d.rule]?RULES[d.rule].name:d.rule)+" • "+hourText+" • เกมละ "+d.gameMins+" นาที";
+}
+
+let editingFieldId=null;
+
+function fillForm(name,d){
+  formState=normalizeDefaults(d);
+  document.getElementById("fieldName").value=name||"";
+  renderAdminSettings();
+  document.getElementById("fieldName").focus();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function resetForm(){
+  editingFieldId=null;
+  document.getElementById("fieldName").value="";
+  formState={teamCount:4,rule:"C",totalBudget:150,gameMins:8,breakMins:2};
+  renderAdminSettings();
+}
+
+
+function renderAdminSettings(){
+  const box=document.getElementById("adminSettings");
+  if(!box) return;
+
+  if(formState.teamCount===3 && formState.rule==="C") formState.rule="A";
+  const ruleKeys=Object.keys(RULES).filter(k=>RULES[k].supportedTeams.includes(formState.teamCount));
+
+  const durOpts=[
+[90,"1.5 ชม."],[120,"2 ชม."],[150,"2.5 ชม."],[180,"3 ชม."]
+  ];
+
+  box.innerHTML=
+    '<div class="settings-section"><h2>จำนวนทีม</h2><div class="preset-row">'+
+      [3,4].map(n=>'<button class="preset-btn'+(formState.teamCount===n?' active':'')+'" data-admin-team="'+n+'">'+n+' ทีม</button>').join('')+
+    '</div></div>'+
+    '<div class="settings-section"><h2>กติกาการแข่งขัน</h2><div class="preset-row">'+
+      ruleKeys.map(k=>'<button class="preset-btn'+(formState.rule===k?' active':'')+'" data-admin-rule="'+k+'">'+RULES[k].name+'</button>').join('')+
+    '</div><div class="rule-desc">'+RULES[formState.rule].description+'</div></div>'+
+    '<div class="settings-section"><h2>ระยะเวลาการแข่งขัน</h2><div class="preset-row">'+
+      durOpts.map(x=>'<button class="preset-btn'+(formState.totalBudget===x[0]?' active':'')+'" data-admin-budget="'+x[0]+'">'+x[1]+'</button>').join('')+
+    '</div></div>'+
+    '<div class="settings-section"><h2>ตั้งเวลา</h2>'+
+      '<div class="time-setting-row"><span>เล่นเกมละ (นาที)</span><div class="mini-stepper">'+
+        '<button type="button" class="step-btn" data-admin-step="game" data-delta="-1">−</button>'+
+        '<input class="compact-num" id="adminGameMins" inputmode="numeric" value="'+formState.gameMins+'">'+
+        '<button type="button" class="step-btn" data-admin-step="game" data-delta="1">+</button>'+
+      '</div></div>'+
+      '<div class="time-setting-row"><span>ทดเวลา+เปลี่ยนทีม (นาที)</span><div class="mini-stepper">'+
+        '<button type="button" class="step-btn" data-admin-step="break" data-delta="-1">−</button>'+
+        '<input class="compact-num" id="adminBreakMins" inputmode="numeric" value="'+formState.breakMins+'">'+
+        '<button type="button" class="step-btn" data-admin-step="break" data-delta="1">+</button>'+
+      '</div></div>'+
+    '</div>';
+
+  box.querySelectorAll("[data-admin-team]").forEach(b=>b.addEventListener("click",()=>{
+    formState.teamCount=parseInt(b.dataset.adminTeam,10);
+    if(formState.teamCount===3&&formState.rule==="C") formState.rule="A";
+    renderAdminSettings();
+  }));
+  box.querySelectorAll("[data-admin-rule]").forEach(b=>b.addEventListener("click",()=>{
+    formState.rule=b.dataset.adminRule;
+    renderAdminSettings();
+  }));
+  box.querySelectorAll("[data-admin-budget]").forEach(b=>b.addEventListener("click",()=>{
+    formState.totalBudget=parseInt(b.dataset.adminBudget,10);
+    renderAdminSettings();
+  }));
+  box.querySelectorAll("[data-admin-step]").forEach(b=>b.addEventListener("click",()=>{
+    const d=parseInt(b.dataset.delta,10)||0;
+    if(b.dataset.adminStep==="game") formState.gameMins=Math.max(1,formState.gameMins+d);
+    else formState.breakMins=Math.max(0,Math.min(10,formState.breakMins+d));
+    renderAdminSettings();
+  }));
+
+  const gi=document.getElementById("adminGameMins");
+  if(gi) gi.addEventListener("change",()=>{
+    formState.gameMins=Math.max(1,parseInt(gi.value,10)||8);
+    renderAdminSettings();
+  });
+  const bi=document.getElementById("adminBreakMins");
+  if(bi) bi.addEventListener("change",()=>{
+    formState.breakMins=Math.max(0,Math.min(10,parseInt(bi.value,10)||2));
+    renderAdminSettings();
+  });
+}
 
 async function load(){
   const res=await sb.from("tournament_state").select("id,data,updated_at").order("updated_at",{ascending:false});
@@ -80,10 +367,13 @@ async function load(){
     const url=location.origin+basePath+"?id="+encodeURIComponent(x.id);
     const div=document.createElement("div");
     div.className="item";
-    div.innerHTML='<div class="item-top"><div><div class="code">'+esc(name||"ยังไม่ได้ตั้งชื่อสนาม")+'</div><div class="muted">ID '+esc(x.id)+'</div></div></div>'+
+    const defs=normalizeDefaults(x.data&&x.data.fieldDefaults);
+    const isDisabled=!!(x.data&&x.data.disabled);
+    div.innerHTML='<div class="item-top"><div><div class="field-title-line"><span class="code">'+esc(name||"ยังไม่ได้ตั้งชื่อสนาม")+'</span><span class="field-id-inline">/ ID '+esc(x.id)+'</span>'+(isDisabled?'<span class="status-pill off">ปิดใช้งาน</span>':'')+'</div><div class="default-summary">'+esc(defaultText(defs))+'</div></div></div>'+
       '<div class="actions"><a class="btn" href="'+url+'" target="_blank">เปิดสนาม</a>'+
       '<button data-copy="'+url+'">คัดลอกลิงก์</button>'+
       '<button data-edit="'+esc(x.id)+'" data-name="'+esc(name)+'">แก้ไข</button>'+
+      '<button data-toggle="'+esc(x.id)+'" data-disabled="'+(isDisabled?'1':'0')+'">'+(isDisabled?'เปิดใช้งาน':'ปิดใช้งาน')+'</button>'+
       '<button class="danger" data-delete="'+esc(x.id)+'" data-name="'+esc(name)+'">ลบ</button></div>';
     list.appendChild(div);
   });
@@ -93,17 +383,30 @@ async function load(){
   }));
   list.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",async()=>{
     const id=b.dataset.edit;
-    const oldName=b.dataset.name||"";
-    const newName=prompt("แก้ไขชื่อสนาม",oldName);
-    if(newName===null) return;
-    const name=newName.trim();
-    if(!name) return;
     const read=await sb.from("tournament_state").select("data").eq("id",id).single();
     if(read.error){status.textContent="อ่านข้อมูลสนามไม่สำเร็จ";return;}
-    const data=Object.assign({},read.data.data||{},{fieldName:name,updatedAt:Date.now()});
-    const res=await sb.from("tournament_state").update({data,updated_at:new Date().toISOString()}).eq("id",id);
-    if(res.error){status.textContent="แก้ไขชื่อไม่สำเร็จ";return;}
-    status.textContent="แก้ไขชื่อสนามแล้ว";
+    const oldData=read.data.data||{};
+    editingFieldId=id;
+    fillForm((oldData.fieldName||"").trim(),oldData.fieldDefaults);
+    status.textContent="กำลังแก้ไขสนาม ID "+id;
+  }));
+
+  list.querySelectorAll("[data-toggle]").forEach(b=>b.addEventListener("click",async()=>{
+    const id=b.dataset.toggle;
+    const willDisable=b.dataset.disabled!=="1";
+
+    const read=await sb.from("tournament_state").select("data").eq("id",id).single();
+    if(read.error){status.textContent="อ่านข้อมูลสนามไม่สำเร็จ";return;}
+
+    const oldData=read.data.data||{};
+    const data=Object.assign({},oldData,{disabled:willDisable,updatedAt:Date.now()});
+
+    const res=await sb.from("tournament_state")
+      .update({data,updated_at:new Date().toISOString()})
+      .eq("id",id);
+
+    if(res.error){status.textContent="เปลี่ยนสถานะสนามไม่สำเร็จ";return;}
+    status.textContent=willDisable?"ปิดใช้งานสนามแล้ว":"เปิดใช้งานสนามแล้ว";
     load();
   }));
 
@@ -119,15 +422,52 @@ async function load(){
 }
 
 document.getElementById("createBtn").addEventListener("click",async()=>{
-  const name=document.getElementById("fieldName").value.trim()||"สนาม";
+  const name=document.getElementById("fieldName").value.trim();
+  if(!name){status.textContent="กรุณาระบุชื่อสนาม / ชื่อกลุ่ม";return;}
+
+  const fieldDefaults=readCreateDefaults();
+
+  if(editingFieldId){
+    const read=await sb.from("tournament_state").select("data").eq("id",editingFieldId).single();
+    if(read.error){status.textContent="อ่านข้อมูลสนามไม่สำเร็จ";return;}
+
+    const oldData=read.data.data||{};
+    const data=Object.assign({},oldData,{
+      fieldName:name,
+      fieldDefaults:fieldDefaults,
+      updatedAt:Date.now()
+    });
+
+    const res=await sb.from("tournament_state")
+      .update({data:data,updated_at:new Date().toISOString()})
+      .eq("id",editingFieldId);
+
+    if(res.error){status.textContent="บันทึกการแก้ไขไม่สำเร็จ";return;}
+    status.textContent="แก้ไขสนาม "+name+" แล้ว";
+    resetForm();
+    load();
+    return;
+  }
+
   const id=code();
-  const data={started:false,fieldName:name,createdAt:Date.now(),updatedAt:Date.now()};
-  const res=await sb.from("tournament_state").upsert({id,data,updated_at:new Date().toISOString()},{onConflict:"id"});
+  const data={
+    started:false,
+    fieldName:name,
+    fieldDefaults:fieldDefaults,
+    createdAt:Date.now(),
+    updatedAt:Date.now()
+  };
+
+  const res=await sb.from("tournament_state")
+    .upsert({id:id,data:data,updated_at:new Date().toISOString()},{onConflict:"id"});
+
   if(res.error){status.textContent="สร้างสนามไม่สำเร็จ";return;}
   status.textContent="สร้างสนาม "+name+" แล้ว";
-  document.getElementById("fieldName").value="";
+  resetForm();
   load();
 });
+
+renderAdminSettings();
 load();
 </script>
 </body>
