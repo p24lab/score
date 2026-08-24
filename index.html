@@ -1707,7 +1707,7 @@ function renderSettingsTab(){
           '<button type="button" class="step-btn" data-step="break" data-delta="1"'+(started?' disabled':'')+'>+</button>'+
         '</div>'+
       '</div>'+
-      '<div class="time-calc-line">จะใช้เวลาทั้งหมด '+(c.sched.gf+c.sched.gaps*c.brk)+' นาที / เหลือเวลา '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาที</div>'+
+      '<div class="time-calc-line">จะใช้เวลา '+(c.sched.gf+c.sched.gaps*c.brk)+' นาที / เหลือประมาณ '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาที<br>สำหรับนัดชิงที่1 และ ที่3</div>'+
     '</div>'+
     '<div class="settings-section"><h2>ขนาดตัวหนังสือ</h2><div class="preset-row">'+
       '<button class="preset-btn'+(setupFontSize===14?' active':'')+'" data-fontsize="14">เล็ก</button>'+
@@ -1715,7 +1715,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.9</div>'+
+    '<div class="app-version">v47.10</div>'+
     '</div>';
 }
 
