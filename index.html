@@ -1270,6 +1270,62 @@ table.standings th,table.standings td,.tcell,
   }
 }
 
+
+/* settings buttons: slightly shorter */
+.settings-section .preset-btn{
+  min-height:34px!important;
+  height:34px!important;
+  padding:0 11px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+
+/* minute steppers: active/selected feel with subtle yellow tint */
+.mini-stepper{
+  padding:2px!important;
+  border-radius:8px!important;
+  background:rgba(250,204,21,.08)!important;
+  box-shadow:inset 0 0 0 1px rgba(250,204,21,.28)!important;
+}
+.mini-stepper:focus-within{
+  background:rgba(250,204,21,.14)!important;
+  box-shadow:inset 0 0 0 1px rgba(250,204,21,.48)!important;
+}
+.step-btn,
+.compact-num{
+  background:var(--surface2)!important;
+}
+
+
+/* minute controls: same active style as selected team-count buttons */
+.mini-stepper{
+  padding:0!important;
+  border:1px solid var(--gold)!important;
+  border-radius:10px!important;
+  background:rgba(232,185,75,.14)!important;
+  box-shadow:none!important;
+  overflow:hidden;
+}
+.mini-stepper:focus-within{
+  background:rgba(232,185,75,.14)!important;
+  border-color:var(--gold)!important;
+  box-shadow:none!important;
+}
+.mini-stepper .step-btn,
+.mini-stepper .compact-num{
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--gold)!important;
+  box-shadow:none!important;
+  outline:none!important;
+}
+.mini-stepper .compact-num{
+  border-left:1px solid rgba(232,185,75,.28)!important;
+  border-right:1px solid rgba(232,185,75,.28)!important;
+}
+
 </style>
 </head>
 <body>
@@ -1634,7 +1690,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.6</div>'+
+    '<div class="app-version">v47.8</div>'+
     '</div>';
 }
 
