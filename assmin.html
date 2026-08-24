@@ -427,7 +427,7 @@ async function load(){
       .eq("id",id);
 
     if(res.error){status.textContent="เปลี่ยนสถานะสนามไม่สำเร็จ";return;}
-    status.textContent=willDisable?"ปิดใช้งานสนามแล้ว":"เปิดใช้งานสนามแล้ว";
+    status.textContent=willDisable?"ปิดการใช้งานตารางแล้ว":"เปิดการใช้งานตารางแล้ว";
     load();
   }));
 
