@@ -289,8 +289,9 @@ function readCreateDefaults(){
 }
 function defaultText(d){
   d=normalizeDefaults(d);
-  const hourText={90:"1.5 ชม.",120:"2 ชม.",150:"2.5 ชม.",180:"3 ชม."}[d.totalBudget];
-  return d.teamCount+" ทีม • "+(RULES[d.rule]?RULES[d.rule].name:d.rule)+" • "+hourText+" • เกมละ "+d.gameMins+" นาที";
+  const hourText={90:"1.5ชม.",120:"2ชม.",150:"2.5ชม.",180:"3ชม."}[d.totalBudget]||((d.totalBudget/60)+"ชม.");
+  const ruleText=RULES[d.rule]?RULES[d.rule].name:d.rule;
+  return d.teamCount+"ทีม "+hourText+" เกมละ"+d.gameMins+" นาที / "+ruleText;
 }
 
 let editingFieldId=null;
@@ -389,7 +390,7 @@ async function load(){
     div.className="item";
     const defs=normalizeDefaults(x.data&&x.data.fieldDefaults);
     const isDisabled=!!(x.data&&x.data.disabled);
-    div.innerHTML='<div class="item-top"><div><div class="field-title-line"><span class="code">'+esc(name||"ยังไม่ได้ตั้งชื่อสนาม")+'</span><span class="field-id-inline">/ ID '+esc(x.id)+'</span>'+(isDisabled?'<span class="status-pill off">ปิดใช้งาน</span>':'')+'</div><div class="default-summary">'+esc(defaultText(defs))+'</div></div></div>'+
+    div.innerHTML='<div class="item-top"><div><div class="field-title-line"><span class="code">สนาม '+esc(name||"ยังไม่ได้ตั้งชื่อสนาม")+'</span><span class="field-id-inline">/ ID '+esc(x.id)+'</span>'+(isDisabled?'<span class="status-pill off">ปิดใช้งาน</span>':'')+'</div><div class="default-summary">'+esc(defaultText(defs))+'</div></div></div>'+
       '<div class="actions"><a class="btn" href="'+url+'" target="_blank">ตาราง</a>'+
       '<button data-copy="'+url+'">คัดลอก</button>'+
       '<button data-edit="'+esc(x.id)+'" data-name="'+esc(name)+'">แก้ไข</button>'+
