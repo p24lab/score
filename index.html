@@ -1496,7 +1496,7 @@ var selectedColors=["R","B","W","Y"];
 /* Rules are designed/maintained by the admin/developer.
    Players only choose an available rule when creating a tournament. */
 var RULES={
-  A:{name:"เล่น 2 เกมติด",description:"เล่น 2 เกมติดกัน แล้วพัก วนไปเรื่อยๆ จนครบเวลา",supportedTeams:[3,4]},
+  A:{name:"เล่น 2 เกมติด",description:"เล่น 2 เกมติดกันแล้วพัก วนจนครบเวลา",supportedTeams:[3,4]},
   B:{name:"เล่นตามตาราง",description:"เล่นตามตาราง จนครบเวลา",supportedTeams:[3,4]},
   C:{name:"เล่นตามตาราง+นัดชิง",description:"เล่นตามตาราง / ลำดับ1 2 ชิงที่1 / ลำดับ3 4 ชิงที่3",supportedTeams:[4]}
 };
@@ -1989,8 +1989,8 @@ function renderSettingsTab(){
       '</div>'+
       '<div class="time-calc-line">'+
         (((setupRule==="A"||setupRule==="B")&&(setupTeamCount===3||setupTeamCount===4))
-          ?'จะได้เล่นทีมละ '+((c.sched.groupMatches*2)/setupTeamCount).toFixed(((c.sched.groupMatches*2)%setupTeamCount)?1:0)+' เกม / รวม '+(c.sched.used||0)+' นาที / เหลือ '+c.sched.rem+' นาที'
-          :'จะได้เล่นทีมละ '+(((c.sched.groupMatches*2)/setupTeamCount)+1)+' เกม / รวม '+c.budget+' นาที / เหลือ '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาทีสำหรับรอบชิง')+
+          ?'เล่นทีมละ '+((c.sched.groupMatches*2)/setupTeamCount).toFixed(((c.sched.groupMatches*2)%setupTeamCount)?1:0)+' เกม / รวม '+(c.sched.used||0)+' นาที / เหลือ '+c.sched.rem+' นาที'
+          :'เล่นทีมละ '+(((c.sched.groupMatches*2)/setupTeamCount)+1)+' เกม / รวม '+c.budget+' นาที / เหลือ '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาทีสำหรับรอบชิง')+
       '</div>'+
     '</div>'+
     '<div class="settings-section"><h2>ขนาดตัวหนังสือ</h2><div class="preset-row">'+
@@ -1999,7 +1999,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.36</div>'+
+    '<div class="app-version">v47.38</div>'+
     '</div>';
 }
 
