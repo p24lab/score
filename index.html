@@ -1204,6 +1204,13 @@ table.standings th,table.standings td,.tcell,
   line-height:1.5;
 }
 
+
+.no-field-card h2{
+  font-size:calc(var(--app-font-size) * 1.55)!important;
+  line-height:1.1!important;
+  margin-bottom:10px!important;
+}
+
 </style>
 </head>
 <body>
@@ -1554,8 +1561,8 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===15?' active':'')+'" data-fontsize="15">กลาง</button>'+
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
-    (started?'<button class="btn-reset" id="resetBtn">↺ ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.2</div>'+
+    (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
+    '<div class="app-version">v47.4</div>'+
     '</div>';
 }
 

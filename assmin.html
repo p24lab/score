@@ -61,7 +61,8 @@ async function load(){
   list.innerHTML="";
   (res.data||[]).filter(x=>x.id!=="main").forEach(x=>{
     const name=(x.data&&x.data.fieldName)||x.id;
-    const url=location.origin+location.pathname.replace(/admin\.html$/,"")+"?id="+encodeURIComponent(x.id);
+    const basePath=location.pathname.replace(/[^/]+$/,"");
+    const url=location.origin+basePath+"?id="+encodeURIComponent(x.id);
     const div=document.createElement("div");
     div.className="item";
     div.innerHTML='<div class="item-top"><div><div class="code">'+esc(name)+'</div><div class="muted">ID '+esc(x.id)+'</div></div></div>'+
