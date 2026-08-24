@@ -1247,6 +1247,29 @@ table.standings th,table.standings td,.tcell,
   .compact-num{width:32px!important;min-width:32px!important;flex-basis:32px!important;}
 }
 
+
+.time-setting-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:7px 0;
+}
+.time-setting-row .mini-stepper{
+  margin-left:auto;
+  flex-shrink:0;
+}
+.time-calc-line{
+  margin-top:9px!important;
+  white-space:nowrap;
+}
+@media(max-width:390px){
+  .time-setting-row{gap:8px;}
+  .time-calc-line{
+    font-size:calc(var(--app-font-size) * .9)!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1587,21 +1610,23 @@ function renderSettingsTab(){
     '<div class="settings-section"><h2>ตั้งเวลาการแข่งขัน</h2><div class="preset-row">'+pBtn("preset120","2:00 ชม.")+pBtn("preset150","2:30 ชม.")+pBtn("custom","กำหนดเอง")+'</div>'+
       (setupMode==="custom"?'<div class="custom-row"><label style="font-size:12.5px;color:var(--muted);">เวลารวม (นาที)</label><input type="number" min="60" step="5" class="num-input" id="customMins" value="'+setupCustomMins+'"'+(started?' disabled':'')+'></div>':'')+preview+'</div>'+
     '<div class="settings-section"><h2>ตั้งเวลา</h2>'+
-      '<div class="time-inline-row">'+
-        '<span>เกมละ</span>'+
+      '<div class="time-setting-row">'+
+        '<span>เล่นเกมละ (นาที)</span>'+
         '<div class="mini-stepper">'+
           '<button type="button" class="step-btn" data-step="game" data-delta="-1"'+(started?' disabled':'')+'>−</button>'+
           '<input inputmode="numeric" pattern="[0-9]*" class="num-input compact-num" id="gameMinsInput" value="'+setupGameMins+'"'+(started?' disabled':'')+'>'+
           '<button type="button" class="step-btn" data-step="game" data-delta="1"'+(started?' disabled':'')+'>+</button>'+
-        '</div><span>นาที</span>'+
-        '<span class="time-gap">ทดเวลา+เปลี่ยนทีม</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="time-setting-row">'+
+        '<span>ทดเวลา+เปลี่ยนทีม</span>'+
         '<div class="mini-stepper">'+
           '<button type="button" class="step-btn" data-step="break" data-delta="-1"'+(started?' disabled':'')+'>−</button>'+
           '<input inputmode="numeric" pattern="[0-9]*" class="num-input compact-num" id="breakInput" value="'+c.brk+'"'+(started?' disabled':'')+'>'+
           '<button type="button" class="step-btn" data-step="break" data-delta="1"'+(started?' disabled':'')+'>+</button>'+
-        '</div><span>นาที</span>'+
+        '</div>'+
       '</div>'+
-      '<div class="time-calc-line">จะใช้เวลาทั้งหมด '+(c.sched.gf+c.sched.gaps*c.brk)+' นาที &nbsp; เหลือเวลา '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาที</div>'+
+      '<div class="time-calc-line">จะใช้เวลาทั้งหมด '+(c.sched.gf+c.sched.gaps*c.brk)+' นาที / เหลือเวลา '+Math.max(0,c.budget-(c.sched.gf+c.sched.gaps*c.brk))+' นาที</div>'+
     '</div>'+
     '<div class="settings-section"><h2>ขนาดตัวหนังสือ</h2><div class="preset-row">'+
       '<button class="preset-btn'+(setupFontSize===14?' active':'')+'" data-fontsize="14">เล็ก</button>'+
@@ -1609,7 +1634,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.5</div>'+
+    '<div class="app-version">v47.6</div>'+
     '</div>';
 }
 
