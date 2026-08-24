@@ -1326,6 +1326,31 @@ table.standings th,table.standings td,.tcell,
   border-right:1px solid rgba(232,185,75,.28)!important;
 }
 
+
+/* selected yellow only on the minute value */
+.mini-stepper{
+  border:0!important;
+  background:transparent!important;
+  border-radius:0!important;
+  overflow:visible!important;
+}
+.mini-stepper:focus-within{
+  border:0!important;
+  background:transparent!important;
+}
+.mini-stepper .step-btn{
+  border:1px solid var(--line)!important;
+  border-radius:7px!important;
+  background:var(--surface2)!important;
+  color:var(--text)!important;
+}
+.mini-stepper .compact-num{
+  border:1px solid var(--gold)!important;
+  border-radius:10px!important;
+  background:rgba(232,185,75,.14)!important;
+  color:var(--gold)!important;
+}
+
 </style>
 </head>
 <body>
@@ -1690,7 +1715,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.8</div>'+
+    '<div class="app-version">v47.9</div>'+
     '</div>';
 }
 
