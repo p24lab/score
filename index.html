@@ -1461,6 +1461,26 @@ table.standings th,table.standings td,.tcell,
   font-weight:800;
 }
 
+
+/* Shared typography baseline */
+body,button,input,select,textarea,a{
+  font-size:var(--app-font-size,16px);
+  line-height:1.35;
+}
+button,input,select,textarea{font-family:inherit}
+.field-title-line{
+  align-items:baseline!important;
+  line-height:1.35!important;
+}
+.field-title-line .code,
+.field-title-line .field-id-inline,
+.default-summary,
+.actions .btn,
+.actions button{
+  font-size:var(--app-font-size,16px)!important;
+  line-height:1.35!important;
+}
+
 </style>
 </head>
 <body>
@@ -1999,7 +2019,7 @@ function renderSettingsTab(){
       '<button class="preset-btn'+(setupFontSize===16?' active':'')+'" data-fontsize="16">ใหญ่</button>'+
     '</div></div>'+
     (started?'<button class="btn-reset" id="resetBtn">ล้างและสร้างตารางใหม่</button>':'')+
-    '<div class="app-version">v47.38</div>'+
+    '<div class="app-version">v47.39</div>'+
     '</div>';
 }
 
